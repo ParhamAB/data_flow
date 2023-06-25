@@ -1,38 +1,42 @@
-.App {
-  text-align: center;
+@font-face {
+    font-family: 'iranSans';
+    src: url('./../public/assets/fonts/fonts/woff2/IRANSansWeb.woff2') format('woff2'),
+        url('./../public/assets/fonts/fonts/woff/IRANSansWeb.woff') format('woff'),
+        url('./../public/assets/fonts/fonts/ttf/IRANSansWeb.ttf') format('ttf');
+    text-rendering: optimizeLegibility;
+    font-weight: 500;
+    font-display: auto;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
-}
+:root {
+    --toastify-color-light: #fff;
+    --toastify-color-dark: #121212;
+    --toastify-color-info: #3575DD;
+    --toastify-color-success: #79FF44;
+    --toastify-color-warning: #f1c40f;
+    --toastify-color-error: #D73D3D;
+    --toastify-color-transparent: rgba(255, 255, 255, 0.7);
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
-}
+    --toastify-icon-color-info: var(--toastify-color-info);
+    --toastify-icon-color-success: var(--toastify-color-success);
+    --toastify-icon-color-warning: var(--toastify-color-warning);
+    --toastify-icon-color-error: var(--toastify-color-error);
 
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
-}
+    --toastify-toast-width: 370px;
+    --toastify-toast-background: transparent;
+    --toastify-toast-min-height: 60px;
+    --toastify-toast-max-height: 800px;
+    --toastify-font-family: 'IranSans';
+    --toastify-z-index: 9999;
 
-.App-link {
-  color: #61dafb;
-}
+    --toastify-text-color-light: #757575;
+    --toastify-text-color-dark: #fff;
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+    --toastify-spinner-color: #616161;
+    --toastify-spinner-color-empty-area: #e0e0e0;
+    --toastify-color-progress-dark: #bb86fc;
+    --toastify-color-progress-info: var(--toastify-color-info);
+    --toastify-color-progress-success: var(--toastify-color-success);
+    --toastify-color-progress-warning: var(--toastify-color-warning);
+    --toastify-color-progress-error: var(--toastify-color-error);
 }
