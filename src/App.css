@@ -40,3 +40,34 @@
     --toastify-color-progress-warning: var(--toastify-color-warning);
     --toastify-color-progress-error: var(--toastify-color-error);
 }
+
+@keyframes ripple {
+    to {
+        transform: scale(4);
+        opacity: 0;
+    }
+}
+
+body {
+    box-sizing: border-box;
+    overflow-x: hidden;
+}
+
+div::-webkit-scrollbar {
+    display: block;
+    width: 3px;
+    height: fit-content;
+    border-radius: 15px;
+    background-color: #1E1E1E;
+    position: absolute;
+    left: 0;
+    z-index: 100;
+}
+
+div::-webkit-scrollbar-thumb {
+    background: #6600ce;
+}
+
+div::-webkit-scrollbar-thumb:hover {
+    background: #6600ce;
+}

@@ -1,27 +1,62 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import Theme from "../../theme/theme";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import FiberManualRecordIcon from "@mui/icons-material/FiberManualRecord";
-import { Text } from "../widgets/widgets";
+import { useLocation, useNavigate } from "react-router-dom";
 
-function NavBarItem({ title, icon, subButtons = [], onClick }) {
+function NavBarItem({
+  title,
+  iconInActive,
+  iconActive,
+  subButtons = [],
+  router,
+}) {
   const [isOpen, setIsOpen] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);
+  const location = useLocation();
+  const toggleHover = () => setIsHovered(!isHovered);
+  const navigator = useNavigate();
+
+  useEffect(() => {
+    if (subButtons.length === 0) {
+      if (location.pathname === router) {
+        setIsOpen(true);
+      } else {
+        setIsOpen(false);
+      }
+    } else {
+      if (location.pathname.includes(router)) {
+        setIsOpen(true);
+      } else {
+        setIsOpen(false);
+      }
+    }
+    // eslint-disable-next-line
+  }, [location]);
 
   return (
     <Container>
       <Button
+        onMouseEnter={toggleHover}
+        onMouseLeave={toggleHover}
         onClick={
           subButtons.length > 0
             ? () => {
-                setIsOpen(!isOpen);
+                if (!location.pathname.includes(router)) {
+                  setIsOpen(!isOpen);
+                }
               }
-            : onClick
+            : () => {
+                navigator(router);
+              }
         }
         isOpen={isOpen}
       >
         <Border style={{ opacity: isOpen ? "1" : "0" }} />
-        {icon}
+        <IconContainer>
+          {isOpen || isHovered ? iconActive : iconInActive}
+        </IconContainer>
         <TextNavBar style={{ color: isOpen ? Theme.fontColor : null }}>
           {title}
         </TextNavBar>
@@ -43,10 +78,18 @@ function NavBarItem({ title, icon, subButtons = [], onClick }) {
       >
         {subButtons.map((e) => {
           return (
-            <SubButton onClick={e.onClick}>
+            <SubButton
+              isOpen={location.pathname === e.router}
+              onClick={() => {
+                navigator(e.router);
+              }}
+            >
               <FiberManualRecordIcon
                 style={{
-                  color: Theme.fontColorInActive,
+                  color:
+                    location.pathname === e.router
+                      ? Theme.purpleColorLight
+                      : Theme.fontColorInActive,
                   marginLeft: "15px",
                   fontSize: "10px",
                 }}
@@ -97,17 +140,8 @@ const Button = styled.div`
     background-color: ${Theme.backGroundColorGrey};
   }
 
-  &:hover ${TextNavBar}, &:hover .icons,
-  &:hover .arrowDown {
+  &:hover ${TextNavBar}, &:hover .arrowDown {
     color: ${Theme.fontColor};
-    transition: 300ms;
-  }
-
-  .icons {
-    color: ${(props) =>
-      props.isOpen ? Theme.fontColor : Theme.fontColorInActive};
-    font-size: 30px;
-    margin-left: 10px;
   }
 
   .arrowDown {
@@ -119,6 +153,13 @@ const Button = styled.div`
   }
 `;
 
+const IconContainer = styled.div`
+  margin-left: 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+`;
+
 const SubContainer = styled.div`
   width: 100%;
   background-color: ${Theme.secondBackGround};
@@ -126,7 +167,7 @@ const SubContainer = styled.div`
   flex-direction: column;
   justify-content: space-evenly;
   align-items: flex-starts;
-  transition: 500ms;
+  transition: 300ms;
   overflow: hidden;
 `;
 
@@ -136,6 +177,7 @@ const SubButton = styled.div`
   font-size: 13px;
   color: ${Theme.fontColorInActive};
   font-weight: 500;
+  color: ${(props) => (props.isOpen ? Theme.fontColor : "none")};
   cursor: pointer;
 
   &:hover {

@@ -8,6 +8,8 @@ class Theme {
   static purpleColorLight = "#6600CC";
   static greenColor = "#39EF9E";
   static redColor = "#FF9D9D";
+  static textFieldBorderRadius = "8px";
+  static fontSize = "15px";
 }
 
 export default Theme;
