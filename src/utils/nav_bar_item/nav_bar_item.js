@@ -76,26 +76,35 @@ function NavBarItem({
           opacity: isOpen ? "1" : "0",
         }}
       >
-        {subButtons.map((e) => {
+        {subButtons.map((e, index) => {
           return (
-            <SubButton
-              isOpen={location.pathname === e.router}
-              onClick={() => {
-                navigator(e.router);
-              }}
-            >
-              <FiberManualRecordIcon
-                style={{
-                  color:
-                    location.pathname === e.router
-                      ? Theme.purpleColorLight
-                      : Theme.fontColorInActive,
-                  marginLeft: "15px",
-                  fontSize: "10px",
+            <>
+              {index > 0 ? (
+                <Divider>
+                  <InnerDivider></InnerDivider>
+                </Divider>
+              ) : (
+                <></>
+              )}
+              <SubButton
+                isOpen={location.pathname === e.router}
+                onClick={() => {
+                  navigator(e.router);
                 }}
-              />
-              {e.title}
-            </SubButton>
+              >
+                <FiberManualRecordIcon
+                  style={{
+                    color:
+                      location.pathname === e.router
+                        ? Theme.purpleColorLight
+                        : Theme.fontColorInActive,
+                    marginLeft: "15px",
+                    fontSize: "10px",
+                  }}
+                />
+                {e.title}
+              </SubButton>
+            </>
           );
         })}
       </SubContainer>
@@ -165,7 +174,7 @@ const SubContainer = styled.div`
   background-color: ${Theme.secondBackGround};
   display: flex;
   flex-direction: column;
-  justify-content: space-evenly;
+  justify-content: center;
   align-items: flex-starts;
   transition: 300ms;
   overflow: hidden;
@@ -192,4 +201,22 @@ const Border = styled.div`
   background-color: ${Theme.purpleColorLight};
   margin-left: 5px;
   transition: 300ms;
+`;
+
+const Divider = styled.div`
+  height: 30px;
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: center;
+  margin-right: 44px;
+  box-sizing: border-box;
+  padding-bottom: 5px;
+`;
+
+const InnerDivider = styled.div`
+  width: 2px;
+  height: 30px;
+  border-radius: 2px;
+  background-color: ${Theme.fontColorInActive};
 `;

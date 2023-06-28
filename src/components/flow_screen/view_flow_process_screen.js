@@ -7,38 +7,40 @@ import CustomButton from "../../utils/custom_button/custom_button";
 import ZoomIcon from "../../utils/icons/zoom_icon";
 import Theme from "../../theme/theme";
 import { useDispatch, useSelector } from "react-redux";
-import { getProcessListFunction } from "../../redux/my_process_screen/my_process_action";
 import moment from "jalali-moment";
 import RunningIcon from "../../utils/icons/running_icon";
 import TickIcon from "../../utils/icons/tick_icon";
 import CloseIcon from "../../utils/icons/close_icon";
-import { getStartTimesListFunction } from "../../redux/start_time_redux/start_time_action";
 import { persianDigits } from "../../utils/utils";
 import ShowIcon from "../../utils/icons/show_icon";
 import DeleteIcon from "../../utils/icons/delete_icon";
+import { getFlowProcessListFunction } from "../../redux/flow_screen/get_flow_process_redux/get_flow_process_action";
+import { getFlowStartTimesListFunction } from "../../redux/flow_screen/flow_start_time_redux/flow_start_time_action";
 import deleteProcessService from "../../service/delete_process_service/delete_process_service.ts";
 
-function ViewMyProcessScreen() {
+function ViewFlowMyProcessScreen() {
   const dispatch = useDispatch();
-  const processList = useSelector((state) => state.processListState);
-  const startTimesList = useSelector((state) => state.startTimesState);
-  const [processType, setProcessType] = useState(null);
+  const processList = useSelector((state) => state.flowProcessListState);
+  const startTimesList = useSelector((state) => state.flowStartTimesState);
   const [title, setTitle] = useState("");
   const [startTimes, setStartTimes] = useState([]);
   const [selectedDate, setSelectedDate] = useState(null);
+  const [status, setStatus] = useState(null);
   const [offSet, setOffSet] = useState(0);
   const [pageNumber, setPageNumber] = useState(1);
 
   useEffect(() => {
-    dispatch(getProcessListFunction("0", "2000-01-01T00:00:00", "0", offSet));
-    dispatch(getStartTimesListFunction());
+    dispatch(
+      getFlowProcessListFunction("", "2000-01-01T00:00:00", "0", offSet)
+    );
+    dispatch(getFlowStartTimesListFunction());
     // eslint-disable-next-line
   }, []);
 
   useEffect(() => {
     setStartTimes([]);
-    if (startTimesList.startTimesList.length > 0) {
-      startTimesList.startTimesList.map((e) => {
+    if (startTimesList.flowStartTimesList.length > 0) {
+      startTimesList.flowStartTimesList.map((e) => {
         setStartTimes((oldArray) => [
           ...oldArray,
           {
@@ -53,7 +55,7 @@ function ViewMyProcessScreen() {
       });
     }
     // eslint-disable-next-line
-  }, [startTimesList.startTimesList]);
+  }, [startTimesList.flowStartTimesList]);
 
   return (
     <Container>
@@ -80,13 +82,14 @@ function ViewMyProcessScreen() {
         </BoxContainer>
         <BoxContainer>
           <DropDown
-            label={"نوع پردازش"}
+            label={"وضعیت"}
             value={[
-              { label: "استخراج رویداد", value: "event" },
-              { label: "استخراج جریان", value: "flow" },
+              { label: "انجام شده", value: "done" },
+              { label: "ناموفق", value: "failed" },
+              { label: "در حال انجام", value: "running" },
             ]}
             onChange={(value) => {
-              setProcessType(value);
+              setStatus(value);
             }}
           />
         </BoxContainer>
@@ -96,8 +99,8 @@ function ViewMyProcessScreen() {
               setOffSet(0);
               setPageNumber(1);
               dispatch(
-                getProcessListFunction(
-                  processType !== null ? processType.value : "",
+                getFlowProcessListFunction(
+                  status !== null ? status.value : "",
                   selectedDate !== null ? selectedDate.value : "",
                   title,
                   0
@@ -120,8 +123,8 @@ function ViewMyProcessScreen() {
           <HeaderText flex={2}>{"ابزار"}</HeaderText>
         </HeaderTable>
         {!processList.loading ? (
-          processList.processList.length > 0 ? (
-            processList.processList.map((e, index) => {
+          processList.flowProcessList.length > 0 ? (
+            processList.flowProcessList.map((e, index) => {
               return (
                 <ValueTable key={index}>
                   <ValueText flex={1}>
@@ -179,8 +182,8 @@ function ViewMyProcessScreen() {
                       onClick={async () => {
                         await deleteProcessService(e.id_process);
                         dispatch(
-                          getProcessListFunction(
-                            processType !== null ? processType.value : "",
+                          getFlowProcessListFunction(
+                            status !== null ? status.value : "",
                             selectedDate !== null ? selectedDate.value : "",
                             title,
                             offSet
@@ -209,7 +212,7 @@ function ViewMyProcessScreen() {
           <TextPageNumber>{`نمایش  ${persianDigits(
             offSet + 1
           )} - ${persianDigits(
-            offSet + processList.processList.length
+            offSet + processList.flowProcessList.length
           )}`}</TextPageNumber>
           <PageHandlerContainer>
             <PageHandler>
@@ -220,8 +223,8 @@ function ViewMyProcessScreen() {
                     : () => {
                         setPageNumber(pageNumber - 1);
                         dispatch(
-                          getProcessListFunction(
-                            processType !== null ? processType.value : "",
+                          getFlowProcessListFunction(
+                            status !== null ? status.value : "",
                             selectedDate !== null ? selectedDate.value : "",
                             title,
                             offSet - 15
@@ -239,13 +242,13 @@ function ViewMyProcessScreen() {
               <TextPage>{persianDigits(pageNumber)}</TextPage>
               <ButtonPage
                 onClick={
-                  processList.processList.length < 15
+                  processList.flowProcessList.length < 15
                     ? null
                     : () => {
                         setPageNumber(pageNumber + 1);
                         dispatch(
-                          getProcessListFunction(
-                            processType !== null ? processType.value : "",
+                          getFlowProcessListFunction(
+                            status !== null ? status.value : "",
                             selectedDate !== null ? selectedDate.value : "",
                             title,
                             offSet + 15
@@ -255,7 +258,7 @@ function ViewMyProcessScreen() {
                       }
                 }
                 color={
-                  processList.processList.length < 15
+                  processList.flowProcessList.length < 15
                     ? Theme.fontColorInActive
                     : Theme.fontColor
                 }
@@ -270,7 +273,7 @@ function ViewMyProcessScreen() {
   );
 }
 
-export default ViewMyProcessScreen;
+export default ViewFlowMyProcessScreen;
 
 const Container = styled.div`
   /* height: calc(100% - 250px); */

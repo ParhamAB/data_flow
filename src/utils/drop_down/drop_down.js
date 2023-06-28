@@ -14,16 +14,34 @@ function DropDown({
     <Container width={width}>
       <Label>{label}</Label>
       <Select
+        isClearable
         options={value}
         isRtl
-        isSearchable={isSearchable}
+        isSearchable
         onChange={onChange}
         placeholder={"انتخاب کنید..."}
         styles={{
+          option: (baseStyles, state) => ({
+            ...baseStyles,
+            backgroundColor: "transparent",
+            ":hover": {
+              backgroundColor: Theme.backGroundColorGrey,
+            },
+          }),
+          singleValue: (baseStyles, state) => ({
+            ...baseStyles,
+            color: Theme.fontColor,
+          }),
+          menuList: (baseStyles, state) => ({
+            ...baseStyles,
+            color: Theme.fontColor,
+            backgroundColor: Theme.secondBackGround,
+          }),
           control: (baseStyles, state) => ({
             ...baseStyles,
             width: width,
             backgroundColor: "transparent",
+            color: "#ffffff",
             border: `1px solid ${Theme.fontColorInActive}`,
             borderColor: state.isFocused
               ? Theme.fontColor

@@ -8,12 +8,13 @@ export default function CustomButton({
   label,
   onClick,
   icon,
+  color = Theme.purpleColorLight,
 }) {
   const ref = useRef(null);
   const ripples = useRipple(ref);
 
   return (
-    <InputButton ref={ref} width={width} onClick={onClick}>
+    <InputButton ref={ref} width={width} onClick={onClick} color={color}>
       {ripples}
       <Container>
         {icon}
@@ -28,13 +29,13 @@ const InputButton = styled.button`
   width: ${(props) => props.width};
   height: 50px;
   border-radius: ${Theme.textFieldBorderRadius};
-  background-color: ${Theme.purpleColorLight};
+  background-color: ${(props) => props.color};
   color: ${Theme.fontColor};
   font-size: ${Theme.fontSize};
   display: flex;
   justify-content: center;
   align-items: center;
-  font-family: "IranSans" !important;
+  font-family: "iranSans" !important;
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
   box-sizing: border-box;
@@ -45,8 +46,10 @@ const InputButton = styled.button`
   overflow: hidden;
 
   &:hover {
-    background-color: ${Theme.purpleColorLight};
-    box-shadow: rgb(19 28 233 / 50%) 0 1px 15px;
+    background-color: ${(props) => props.color};
+    box-shadow: ${(props) =>
+        props.color === Theme.purpleColorLight ? "#6600ccb0" : "none"}
+      0 3px 30px;
   }
 `;
 
