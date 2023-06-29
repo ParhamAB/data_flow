@@ -17,6 +17,7 @@ import { persianDigits } from "../../utils/utils";
 import ShowIcon from "../../utils/icons/show_icon";
 import DeleteIcon from "../../utils/icons/delete_icon";
 import deleteProcessService from "../../service/delete_process_service/delete_process_service.ts";
+import Loading from "../../utils/loading/loading";
 
 function ViewMyProcessScreen() {
   const dispatch = useDispatch();
@@ -73,6 +74,7 @@ function ViewMyProcessScreen() {
             label={"تاریخ آغاز"}
             isSearchable={true}
             value={startTimes}
+            defaultValue={selectedDate}
             onChange={(value) => {
               setSelectedDate(value);
             }}
@@ -81,6 +83,7 @@ function ViewMyProcessScreen() {
         <BoxContainer>
           <DropDown
             label={"نوع پردازش"}
+            defaultValue={processType}
             value={[
               { label: "استخراج رویداد", value: "event" },
               { label: "استخراج جریان", value: "flow" },
@@ -198,10 +201,7 @@ function ViewMyProcessScreen() {
             <NoElementText>{"داده ای وجود ندارد!"}</NoElementText>
           )
         ) : (
-          <Center>
-            <span class="loader"></span>
-            <TextLoading>{"در حال دریافت اطلاعات..."}</TextLoading>
-          </Center>
+          <Loading></Loading>
         )}
       </TableContainer>
       {processList.loading ? null : (
@@ -482,22 +482,6 @@ const ButtonPage = styled.div`
 const TextPage = styled.p`
   font-size: 20px;
   margin-inline: 15px;
-  color: ${Theme.fontColor};
-`;
-
-const Center = styled.div`
-  width: calc(100%);
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  margin-top: 20px;
-`;
-
-const TextLoading = styled.p`
-  font-size: 20px;
-  font-weight: 500;
-  font-family: "iranSans";
   color: ${Theme.fontColor};
 `;
 

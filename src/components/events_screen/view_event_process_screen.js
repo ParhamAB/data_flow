@@ -20,6 +20,7 @@ import { getEventStartTimesListFunction } from "../../redux/events_screen/event_
 import ChartIcon from "../../utils/icons/chart_icon";
 import ActivityIcon from "../../utils/icons/navbar_icons/activity_icon";
 import FilterIcon from "../../utils/icons/filter_icon";
+import Loading from "../../utils/loading/loading";
 
 function ViewEventProcessScreen() {
   const dispatch = useDispatch();
@@ -84,6 +85,7 @@ function ViewEventProcessScreen() {
             label={"تاریخ آغاز"}
             isSearchable={true}
             value={startTimes}
+            defaultValue={selectedDate}
             onChange={(value) => {
               setSelectedDate(value);
             }}
@@ -92,6 +94,7 @@ function ViewEventProcessScreen() {
         <BoxContainer>
           <DropDown
             label={"وضعیت"}
+            defaultValue={status}
             value={[
               { label: "انجام شده", value: "done" },
               { label: "ناموفق", value: "failed" },
@@ -216,10 +219,7 @@ function ViewEventProcessScreen() {
             <NoElementText>{"داده ای وجود ندارد!"}</NoElementText>
           )
         ) : (
-          <Center>
-            <span class="loader"></span>
-            <TextLoading>{"در حال دریافت اطلاعات..."}</TextLoading>
-          </Center>
+          <Loading></Loading>
         )}
       </TableContainer>
       {eventProcessList.loading ? null : (
@@ -500,22 +500,6 @@ const ButtonPage = styled.div`
 const TextPage = styled.p`
   font-size: 20px;
   margin-inline: 15px;
-  color: ${Theme.fontColor};
-`;
-
-const Center = styled.div`
-  width: calc(100%);
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  margin-top: 20px;
-`;
-
-const TextLoading = styled.p`
-  font-size: 20px;
-  font-weight: 500;
-  font-family: "iranSans";
   color: ${Theme.fontColor};
 `;
 

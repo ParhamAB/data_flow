@@ -67,6 +67,7 @@ function NewFlowProcessScreen() {
           <DropDown
             label={"ابتدای بازه"}
             isSearchable={true}
+            defaultValue={""}
             value={[]}
             onChange={(value) => {}}
           />
@@ -75,6 +76,7 @@ function NewFlowProcessScreen() {
           <DropDown
             label={"انتهای بازه"}
             isSearchable={true}
+            defaultValue={""}
             value={[]}
             onChange={(value) => {}}
           />
@@ -83,6 +85,7 @@ function NewFlowProcessScreen() {
           <DropDown
             label={"رویداد ها"}
             isSearchable={true}
+            defaultValue={""}
             value={[]}
             onChange={(value) => {}}
           />

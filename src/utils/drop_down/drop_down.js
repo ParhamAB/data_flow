@@ -8,18 +8,21 @@ function DropDown({
   value,
   onChange,
   isSearchable = false,
-  label,
+  defaultValue = "",
+  label = "",
+  inClearable = true,
 }) {
   return (
     <Container width={width}>
-      <Label>{label}</Label>
+      {label.length > 0 ? <Label>{label}</Label> : null}
       <Select
-        isClearable
+        isClearable={inClearable}
         options={value}
         isRtl
         isSearchable
         onChange={onChange}
         placeholder={"انتخاب کنید..."}
+        value={defaultValue}
         styles={{
           option: (baseStyles, state) => ({
             ...baseStyles,
@@ -35,6 +38,7 @@ function DropDown({
           menuList: (baseStyles, state) => ({
             ...baseStyles,
             color: Theme.fontColor,
+            maxHeight: "250px",
             backgroundColor: Theme.secondBackGround,
           }),
           control: (baseStyles, state) => ({
@@ -69,6 +73,7 @@ const Container = styled.div`
   flex-direction: column;
   justify-content: flex-start;
   align-items: flex-start;
+  margin-inline: 5px;
 `;
 
 const Label = styled.div`

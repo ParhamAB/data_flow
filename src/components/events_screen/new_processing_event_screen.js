@@ -86,6 +86,7 @@ function NewEventProcessScreen() {
           <DropDown
             label={"واحد پنجره زمان بندی"}
             isSearchable={true}
+            defaultValue={windowsType}
             value={[
               { label: "هفته", value: "weeks" },
               { label: "روز", value: "days" },

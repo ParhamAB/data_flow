@@ -14,7 +14,7 @@ const startTimeListReducer = (state = initialState, action) => {
     case "START_TIME_SERVICE_SUCCEED":
       return {
         loading: false,
-        startTimesList: action.payload,
+        startTimesList: action.payload !== undefined ? action.payload : [],
         error: "",
       };
     case "START_TIME_SERVICE_FAILED":

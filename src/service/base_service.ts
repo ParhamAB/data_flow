@@ -36,7 +36,7 @@ export class ServiceCaller {
             this.response = res;
           })
           .catch((err) => {
-            this.response = err;
+            throw err;
           });
         break;
       case MethodsService.POST:
@@ -46,7 +46,7 @@ export class ServiceCaller {
             this.response = res;
           })
           .catch((err) => {
-            this.response = err;
+            throw err;
           });
         break;
       case MethodsService.DELETE:
@@ -56,7 +56,7 @@ export class ServiceCaller {
             this.response = res;
           })
           .catch((err) => {
-            this.response = err;
+            throw err;
           });
         break;
       case MethodsService.PUT:
@@ -66,7 +66,7 @@ export class ServiceCaller {
             this.response = res;
           })
           .catch((err) => {
-            this.response = err;
+            throw err;
           });
         break;
     }

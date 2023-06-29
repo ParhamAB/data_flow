@@ -8,13 +8,20 @@ export default function CustomButton({
   label,
   onClick,
   icon,
+  borderColor = "",
   color = Theme.purpleColorLight,
 }) {
   const ref = useRef(null);
   const ripples = useRipple(ref);
 
   return (
-    <InputButton ref={ref} width={width} onClick={onClick} color={color}>
+    <InputButton
+      ref={ref}
+      width={width}
+      onClick={onClick}
+      color={color}
+      borderColor={borderColor}
+    >
       {ripples}
       <Container>
         {icon}
@@ -40,7 +47,10 @@ const InputButton = styled.button`
   -moz-box-sizing: border-box;
   box-sizing: border-box;
   font-weight: 500;
-  border: 0px solid transparent;
+  border: ${(props) =>
+    props.borderColor.length > 0
+      ? `1px solid ${props.borderColor}`
+      : "0px solid transparent"};
   cursor: pointer;
   transition: 300ms;
   overflow: hidden;

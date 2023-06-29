@@ -2,12 +2,19 @@ import React from "react";
 import styled from "styled-components";
 import Theme from "../../theme/theme";
 
-function TextField({ width = "250px", label, onChange, value }) {
+function TextField({
+  width = "250px",
+  label = "",
+  onChange,
+  value,
+  disabled = false,
+}) {
   return (
     <Container width={width}>
-      <Label>{label}</Label>
+      {label.length > 0 ? <Label>{label}</Label> : null}
       <InputTextField
         type="text"
+        disabled={disabled}
         onChange={onChange}
         value={value}
       ></InputTextField>
@@ -38,8 +45,10 @@ const InputTextField = styled.input`
   width: 100%;
   height: 50px;
   border-radius: ${Theme.textFieldBorderRadius};
-  background-color: transparent;
-  color: ${Theme.fontColor};
+  background-color: ${(props) =>
+    props.disabled ? Theme.secondBackGround : "transparent"};
+  color: ${(props) =>
+    props.disabled ? Theme.fontColorInActive : Theme.fontColor};
   font-size: ${Theme.fontSize};
   display: flex;
   flex-direction: row;
@@ -51,11 +60,16 @@ const InputTextField = styled.input`
   -moz-box-sizing: border-box;
   box-sizing: border-box;
   font-weight: 500;
-  border: 1px solid ${Theme.fontColorInActive};
-  cursor: pointer;
+  border: 1px solid
+    ${(props) =>
+      props.disabled ? Theme.secondBackGround : Theme.fontColorInActive};
+  cursor: ${(props) => (props.disabled ? "default" : "pointer")};
 
-  &:focus,
+  ${(props) =>
+    !props.disabled
+      ? `&:focus,
   &:hover {
     border: 1px solid ${Theme.fontColor};
-  }
+  }`
+      : null}
 `;

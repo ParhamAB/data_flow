@@ -14,7 +14,7 @@ const flowStartTimeListReducer = (state = initialState, action) => {
     case "FLOW_START_TIME_SERVICE_SUCCEED":
       return {
         loading: false,
-        flowStartTimesList: action.payload,
+        flowStartTimesList: action.payload !== undefined ? action.payload : [],
         error: "",
       };
     case "FLOW_START_TIME_SERVICE_FAILED":

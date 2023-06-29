@@ -14,7 +14,7 @@ const eventStartTimeListReducer = (state = initialState, action) => {
     case "EVENT_START_TIME_SERVICE_SUCCEED":
       return {
         loading: false,
-        eventStartTimesList: action.payload,
+        eventStartTimesList: action.payload !== undefined ? action.payload : [],
         error: "",
       };
     case "EVENT_START_TIME_SERVICE_FAILED":

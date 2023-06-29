@@ -17,9 +17,12 @@ import DeleteIcon from "../../utils/icons/delete_icon";
 import { getFlowProcessListFunction } from "../../redux/flow_screen/get_flow_process_redux/get_flow_process_action";
 import { getFlowStartTimesListFunction } from "../../redux/flow_screen/flow_start_time_redux/flow_start_time_action";
 import deleteProcessService from "../../service/delete_process_service/delete_process_service.ts";
+import Loading from "../../utils/loading/loading";
+import { useNavigate } from "react-router-dom";
 
 function ViewFlowMyProcessScreen() {
   const dispatch = useDispatch();
+  const navigator = useNavigate();
   const processList = useSelector((state) => state.flowProcessListState);
   const startTimesList = useSelector((state) => state.flowStartTimesState);
   const [title, setTitle] = useState("");
@@ -75,6 +78,7 @@ function ViewFlowMyProcessScreen() {
             label={"تاریخ آغاز"}
             isSearchable={true}
             value={startTimes}
+            defaultValue={selectedDate}
             onChange={(value) => {
               setSelectedDate(value);
             }}
@@ -83,6 +87,7 @@ function ViewFlowMyProcessScreen() {
         <BoxContainer>
           <DropDown
             label={"وضعیت"}
+            defaultValue={status}
             value={[
               { label: "انجام شده", value: "done" },
               { label: "ناموفق", value: "failed" },
@@ -175,10 +180,28 @@ function ViewFlowMyProcessScreen() {
                     )}
                   </ValueText>
                   <ValueText flex={2}>
-                    <ButtonEachTable>
-                      <ShowIcon />
+                    <ButtonEachTable
+                      isActive={e.status_title === "done"}
+                      onClick={
+                        e.status_title === "done"
+                          ? () => {
+                              navigator(
+                                `/flow/all-process/${e.id_flow_process}`
+                              );
+                            }
+                          : null
+                      }
+                    >
+                      <ShowIcon
+                        color={
+                          e.status_title === "done"
+                            ? Theme.fontColor
+                            : Theme.fontColorInActive
+                        }
+                      />
                     </ButtonEachTable>
                     <ButtonEachTable
+                      isActive
                       onClick={async () => {
                         await deleteProcessService(e.id_process);
                         dispatch(
@@ -201,10 +224,7 @@ function ViewFlowMyProcessScreen() {
             <NoElementText>{"داده ای وجود ندارد!"}</NoElementText>
           )
         ) : (
-          <Center>
-            <span class="loader"></span>
-            <TextLoading>{"در حال دریافت اطلاعات..."}</TextLoading>
-          </Center>
+          <Loading></Loading>
         )}
       </TableContainer>
       {processList.loading ? null : (
@@ -488,35 +508,23 @@ const TextPage = styled.p`
   color: ${Theme.fontColor};
 `;
 
-const Center = styled.div`
-  width: calc(100%);
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  margin-top: 20px;
-`;
-
-const TextLoading = styled.p`
-  font-size: 20px;
-  font-weight: 500;
-  font-family: "iranSans";
-  color: ${Theme.fontColor};
-`;
-
 const ButtonEachTable = styled.div`
   width: 40px;
   height: 40px;
   border-radius: ${Theme.textFieldBorderRadius};
-  border: 1px solid ${Theme.fontColor};
+  border: 1px solid
+    ${(props) => (props.isActive ? Theme.fontColor : Theme.fontColorInActive)};
   display: flex;
   justify-content: center;
   align-items: center;
   margin-inline: 5px;
-  cursor: pointer;
+  cursor: ${(props) => (props.isActive ? "pointer" : "default")};
   transition: 300ms;
 
-  &:hover {
+  ${(props) =>
+    props.isActive
+      ? `&:hover {
     background-color: #6600cc6b;
-  }
+  }`
+      : null}
 `;
