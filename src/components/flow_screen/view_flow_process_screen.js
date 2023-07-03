@@ -62,7 +62,11 @@ function ViewFlowMyProcessScreen() {
 
   return (
     <Container>
-      <Text text={"پردازش های من"} fontSize="20px" fontWeight={700}></Text>
+      <Text
+        text={"پردازش های جریان شناسی"}
+        fontSize="20px"
+        fontWeight={700}
+      ></Text>
       <SearchForm>
         <BoxContainer>
           <TextField

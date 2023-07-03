@@ -10,6 +10,11 @@ import getMonthsAnalysisListReducer from "./statistical-analysis-of-database_red
 import getDaysAnalysisListReducer from "./statistical-analysis-of-database_redux/days_redux/days_reducer";
 import getFlowProcessInfoListReducer from "./flow_screen/get_flow_process_by_id_redux/get_flow_process_info/get_flow_process_info_by_id_reducer";
 import getFlowProcessStatisticsListReducer from "./flow_screen/get_flow_process_by_id_redux/get_flow_process_statistics/get_flow_process_statistics_reducer";
+import pickDateReducer from "./date_redux/pick_date_reducer";
+import mediaListReducer from "./main_menu_screen/media_redux/media_reducer";
+import eventsNewsListReducer from "./main_menu_screen/events_redux/events_reducer";
+import flowChartMainMenuListReducer from "./main_menu_screen/flow_redux/flow_reducer";
+import eventChartListReducer from "./events_screen/events_chart_redux/events_chart_redux_reducer";
 
 const rootReducer = combineReducers({
   processListState: processListReducer,
@@ -23,6 +28,11 @@ const rootReducer = combineReducers({
   daysAnalysisListState: getDaysAnalysisListReducer,
   getFlowProcessInfoListState: getFlowProcessInfoListReducer,
   getFlowProcessStatisticsListState: getFlowProcessStatisticsListReducer,
+  pickDateListState: pickDateReducer,
+  mediaListState: mediaListReducer,
+  eventsNewsListState: eventsNewsListReducer,
+  flowChartMainMenuListState: flowChartMainMenuListReducer,
+  eventChartListState: eventChartListReducer,
 });
 
 export default rootReducer;

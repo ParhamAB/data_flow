@@ -2,6 +2,7 @@ import React from "react";
 import Select from "react-select";
 import Theme from "../../theme/theme";
 import styled from "styled-components";
+import { persianDigits } from "../utils";
 
 function DropDown({
   width = "250px",
@@ -11,6 +12,7 @@ function DropDown({
   defaultValue = "",
   label = "",
   inClearable = true,
+  isDisabled = false,
 }) {
   return (
     <Container width={width}>
@@ -19,10 +21,17 @@ function DropDown({
         isClearable={inClearable}
         options={value}
         isRtl
-        isSearchable
+        isSearchable={isSearchable}
         onChange={onChange}
         placeholder={"انتخاب کنید..."}
         value={defaultValue}
+        isDisabled={isDisabled}
+        filterOption={(options, inputValue) => {
+          const persianInputValue = persianDigits(inputValue);
+          return persianInputValue.length > 0
+            ? options.label.includes(persianInputValue)
+            : true;
+        }}
         styles={{
           option: (baseStyles, state) => ({
             ...baseStyles,
@@ -83,4 +92,5 @@ const Label = styled.div`
   color: ${Theme.fontColor};
   margin-bottom: 5px;
   padding-right: 5px;
+  user-select: none;
 `;

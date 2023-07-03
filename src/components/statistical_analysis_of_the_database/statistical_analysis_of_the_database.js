@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import styled from "styled-components";
 import { Text } from "../../utils/widgets/widgets";
 import Theme from "../../theme/theme";
@@ -8,9 +8,11 @@ import DropDown from "../../utils/drop_down/drop_down";
 import { useDispatch, useSelector } from "react-redux";
 import { getYearsAnalysisListFunction } from "../../redux/statistical-analysis-of-database_redux/years_redux/years_action";
 import {
+  englishDigits,
   isStringOnlyNumbers,
   persianDigits,
   persianMonth,
+  persianMonthToNumber,
 } from "../../utils/utils";
 import moment from "jalali-moment";
 import {
@@ -20,7 +22,7 @@ import {
   BarElement,
   Tooltip,
 } from "chart.js";
-import { Bar } from "react-chartjs-2";
+import { Bar, getElementsAtEvent } from "react-chartjs-2";
 import Loading from "../../utils/loading/loading";
 import { getMonthsAnalysisListFunction } from "../../redux/statistical-analysis-of-database_redux/months_redux/months_action";
 import { getDaysAnalysisListFunction } from "../../redux/statistical-analysis-of-database_redux/days_redux/days_action";
@@ -42,6 +44,10 @@ function StatisticalAnalysisOfDatabase() {
   const [justDaysTextField_year, setJustDaysTextField_year] = useState("");
   const [justDaysTextField_month, setJustDaysTextField_month] = useState(null);
   const [isFirstLoad, setIsFirstLoad] = useState(true);
+
+  const yearChartRef = useRef(null);
+  const monthChartRef = useRef(null);
+  const daysChartRef = useRef(null);
   //   const startTimesList = useSelector((state) => state.flowStartTimesState);
 
   useEffect(() => {
@@ -53,10 +59,13 @@ function StatisticalAnalysisOfDatabase() {
     setYearsLabel([]);
     yearsAnalysis.yearsData.map((e, index) => {
       if (index === yearsAnalysis.yearsData.length - 1 && isFirstLoad) {
-        setJustMonthTextField(e._year);
+        setJustMonthTextField(moment(`${e._year}-01-01`).format("jYYYY"));
         dispatch(getMonthsAnalysisListFunction(e._year));
       }
-      setYearsLabel((oldArrays) => [...oldArrays, e._year]);
+      setYearsLabel((oldArrays) => [
+        ...oldArrays,
+        persianDigits(moment(`${e._year}-01-01`).format("jYYYY")),
+      ]);
       setYearsData((oldArrays) => [...oldArrays, e.count]);
     });
   }, [yearsAnalysis.yearsData]);
@@ -66,7 +75,9 @@ function StatisticalAnalysisOfDatabase() {
     setMonthsLabel([]);
     monthsAnalysis.monthsData.map((e, index) => {
       if (index === monthsAnalysis.monthsData.length - 1 && isFirstLoad) {
-        setJustDaysTextField_year(yearsAnalysis.lastYear);
+        setJustDaysTextField_year(
+          moment(`${yearsAnalysis.lastYear}-01-01`).format("jYYYY")
+        );
         setJustDaysTextField_month({
           label: persianMonth(e._month),
           value: e._month,
@@ -88,9 +99,49 @@ function StatisticalAnalysisOfDatabase() {
     });
   }, [daysAnalysis.daysData]);
 
+  const handleBarYearClick = (event) => {
+    let details = getElementsAtEvent(yearChartRef.current, event);
+    if (details.length > 0) {
+      let temp = moment(
+        `${englishDigits(yearsLabel[details[0].index])}-01-01`,
+        "jYYYY-jMM-jDD"
+      );
+      setJustMonthTextField(yearsLabel[details[0].index]);
+      dispatch(
+        getMonthsAnalysisListFunction(parseInt(moment(temp).format("YYYY")) + 1)
+      );
+    }
+  };
+
+  const handleBarMonthClick = (event) => {
+    let details = getElementsAtEvent(monthChartRef.current, event);
+    if (details.length > 0) {
+      let temp = moment(
+        `${englishDigits(justMonthTextField)}-01-01`,
+        "jYYYY-jMM-jDD"
+      );
+      setJustDaysTextField_year(justMonthTextField);
+      setJustDaysTextField_month({
+        label: monthsLabel[details[0].index],
+        value: persianMonthToNumber(monthsLabel[details[0].index]),
+      });
+      setJustMonthTextField(yearsLabel[details[0].index]);
+      dispatch(
+        getDaysAnalysisListFunction(
+          parseInt(moment(temp).format("YYYY")) + 1,
+          persianMonthToNumber(monthsLabel[details[0].index])
+        )
+      );
+    }
+  };
+
   return (
     <Container>
-      <Text text={"پردازش های من"} fontSize="20px" fontWeight={700}></Text>
+      <Text
+        text={"تحلیل آماری پایگاه داده"}
+        fontSize="20px"
+        fontWeight={700}
+      ></Text>
       <BoxContainer>
         <ChartContainer>
           <RowTitle>
@@ -100,6 +151,8 @@ function StatisticalAnalysisOfDatabase() {
             <>
               <Center>
                 <Bar
+                  onClick={handleBarYearClick}
+                  ref={yearChartRef}
                   data={{
                     labels: yearsLabel,
                     datasets: [
@@ -179,9 +232,15 @@ function StatisticalAnalysisOfDatabase() {
                   label={"نمایش"}
                   onClick={() => {
                     if (isStringOnlyNumbers(justMonthTextField)) {
-                      if (parseInt(justMonthTextField) < 2100) {
+                      if (parseInt(justMonthTextField) < 1600) {
+                        let temp = moment(
+                          `${justMonthTextField}-01-01`,
+                          "jYYYY-jMM-jDD"
+                        );
                         dispatch(
-                          getMonthsAnalysisListFunction(justMonthTextField)
+                          getMonthsAnalysisListFunction(
+                            moment(temp).format("YYYY")
+                          )
                         );
                       }
                     }
@@ -196,6 +255,8 @@ function StatisticalAnalysisOfDatabase() {
             <>
               <Center>
                 <Bar
+                  ref={monthChartRef}
+                  onClick={handleBarMonthClick}
                   data={{
                     labels: monthsLabel,
                     datasets: [
@@ -300,10 +361,14 @@ function StatisticalAnalysisOfDatabase() {
                   label={"نمایش"}
                   onClick={() => {
                     if (isStringOnlyNumbers(justDaysTextField_year)) {
-                      if (parseInt(justDaysTextField_year) < 2100) {
+                      if (parseInt(justDaysTextField_year) < 1600) {
+                        let temp = moment(
+                          `${justDaysTextField_year}-01-01`,
+                          "jYYYY-jMM-jDD"
+                        );
                         dispatch(
                           getDaysAnalysisListFunction(
-                            justDaysTextField_year,
+                            moment(temp).format("YYYY"),
                             justDaysTextField_month.value
                           )
                         );
@@ -318,6 +383,7 @@ function StatisticalAnalysisOfDatabase() {
             <>
               <Center>
                 <Bar
+                  ref={daysChartRef}
                   data={{
                     labels: daysLabel,
                     datasets: [

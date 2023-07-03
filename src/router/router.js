@@ -7,11 +7,16 @@ import NewFlowProcessScreen from "../components/flow_screen/new_processing_flow_
 import ViewFlowMyProcessScreen from "../components/flow_screen/view_flow_process_screen";
 import StatisticalAnalysisOfDatabase from "../components/statistical_analysis_of_the_database/statistical_analysis_of_the_database";
 import ViewFlowMyProcessByIdScreen from "../components/flow_screen/view_flow_process_by_id_screen";
+import MainMenuScreen from "../components/main_menu_screen/main_menu_screen";
+import ShowEventChart from "../components/events_screen/show_events_chart_screen/show_event_chart_screen";
 
 function Router() {
   return (
     <Routes>
-      <Route path="/main-menu" element={<></>}></Route>
+      <Route
+        path="/main-menu"
+        element={<MainMenuScreen></MainMenuScreen>}
+      ></Route>
       <Route
         path="/my-process"
         element={<ViewMyProcessScreen></ViewMyProcessScreen>}
@@ -24,6 +29,10 @@ function Router() {
         <Route
           path="/events/all-process"
           element={<ViewEventProcessScreen></ViewEventProcessScreen>}
+        ></Route>
+        <Route
+          path="/events/all-process/statistics/:id"
+          element={<ShowEventChart></ShowEventChart>}
         ></Route>
       </Route>
       <Route path="/flow">
@@ -46,7 +55,7 @@ function Router() {
           <StatisticalAnalysisOfDatabase></StatisticalAnalysisOfDatabase>
         }
       ></Route>
-      <Route path="/*" element={<Navigate to={"/main-menu"} />}></Route>
+      {/* <Route path="/*" element={<Navigate to={"/main-menu"} />}></Route> */}
     </Routes>
   );
 }

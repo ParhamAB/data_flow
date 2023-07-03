@@ -10,24 +10,52 @@ import { useDispatch, useSelector } from "react-redux";
 import moment from "jalali-moment";
 import { Filter } from "@mui/icons-material";
 import FilterIcon from "../../utils/icons/filter_icon";
+import { persianDigits } from "../../utils/utils";
+import { getPickDateFunction } from "../../redux/date_redux/pick_date_action";
+import postNewEventTaskService from "../../service/event_process_screen/create_event_service/create_event_process_service.ts";
 
 function NewEventProcessScreen() {
   const dispatch = useDispatch();
-  //   const eventProcessList = useSelector((state) => state.eventProcessListState);
-  //   const eventStartTimesList = useSelector(
-  //     (state) => state.eventStartTimesState
-  //   );
-  const [status, setStatus] = useState(null);
+  const DateTimesList = useSelector((state) => state.pickDateListState);
   const [title, setTitle] = useState("");
-  const [startTimes, setStartTimes] = useState([]);
-  const [selectedDate, setSelectedDate] = useState(null);
+  const [timesList, setTimesList] = useState([]);
+  const [startTimes, setStartTimes] = useState(null);
+  const [endTimes, setEndTimes] = useState(null);
+  const [maxDf, setMaxDf] = useState(0);
   const [windowsType, setWindowsType] = useState(null);
+  const [numberWindowsType, setNumberWindowsType] = useState(0);
+  const [deletePercent, setDeletePercent] = useState(0);
+  const [lang, setLang] = useState(null);
+  const [eventNumber, setEventNumber] = useState(0);
+  const [lowestNumberProcess, setLowestNumberProcess] = useState(0);
+  const [diffEvents, setDiffEvents] = useState(0);
+  const [numberWords, setNumberWords] = useState(0);
   const [isOpen, setIsOpen] = useState(false);
 
-  //   useEffect(() => {
-  //     dispatch(getEventStartTimesListFunction());
-  //     // eslint-disable-next-line
-  //   }, []);
+  useEffect(() => {
+    dispatch(getPickDateFunction());
+    // eslint-disable-next-line
+  }, []);
+
+  useEffect(() => {
+    setTimesList([]);
+    if (DateTimesList.dateList.length > 0) {
+      DateTimesList.dateList.map((e) => {
+        setTimesList((oldArray) => [
+          ...oldArray,
+          {
+            value: e.created_at.split("+")[0],
+            label: persianDigits(
+              moment(e.created_at).format("jYYYY/jMM/jDD") +
+                " - " +
+                moment(e.created_at).format("HH:mm")
+            ),
+          },
+        ]);
+      });
+    }
+    // eslint-disable-next-line
+  }, [DateTimesList.dateList]);
 
   //   useEffect(() => {
   //     setStartTimes([]);
@@ -70,16 +98,22 @@ function NewEventProcessScreen() {
           <DropDown
             label={"ابتدای بازه"}
             isSearchable={true}
-            value={[]}
-            onChange={(value) => {}}
+            defaultValue={startTimes}
+            value={timesList}
+            onChange={(value) => {
+              setStartTimes(value);
+            }}
           />
         </BoxContainer>
         <BoxContainer>
           <DropDown
             label={"انتهای بازه"}
             isSearchable={true}
-            value={[]}
-            onChange={(value) => {}}
+            defaultValue={endTimes}
+            value={timesList}
+            onChange={(value) => {
+              setEndTimes(value);
+            }}
           />
         </BoxContainer>
         <BoxContainer>
@@ -101,9 +135,25 @@ function NewEventProcessScreen() {
         <IntValueContainer>
           <IntValuelabel>{"تعداد پنجره های زمانبندی"}</IntValuelabel>
           <IntValueButtonContainer>
-            <IntValueButton>+</IntValueButton>
-            <IntValue>0</IntValue>
-            <IntValueButton>-</IntValueButton>
+            <IntValueButton
+              onClick={() => {
+                if (numberWindowsType < 100) {
+                  setNumberWindowsType(numberWindowsType + 1);
+                }
+              }}
+            >
+              +
+            </IntValueButton>
+            <IntValue>{persianDigits(numberWindowsType)}</IntValue>
+            <IntValueButton
+              onClick={() => {
+                if (numberWindowsType > 0) {
+                  setNumberWindowsType(numberWindowsType - 1);
+                }
+              }}
+            >
+              -
+            </IntValueButton>
           </IntValueButtonContainer>
         </IntValueContainer>
 
@@ -113,8 +163,15 @@ function NewEventProcessScreen() {
               <DropDown
                 label={"زبان"}
                 isSearchable={true}
-                value={[]}
-                onChange={(value) => {}}
+                defaultValue={lang}
+                value={[
+                  { label: "دو زبانه", value: "multilingual" },
+                  { label: "فارسی", value: "fa" },
+                  { label: "انگلیسی", value: "en" },
+                ]}
+                onChange={(value) => {
+                  setLang(value);
+                }}
               />
             </BoxContainer>,
             <IntValueContainer>
@@ -122,33 +179,97 @@ function NewEventProcessScreen() {
                 {"حذف عبارت پردازشی بیش از این درصد"}
               </IntValuelabel>
               <IntValueButtonContainer>
-                <IntValueButton>+</IntValueButton>
-                <IntValue>0</IntValue>
-                <IntValueButton>-</IntValueButton>
+                <IntValueButton
+                  onClick={() => {
+                    if (maxDf < 100) {
+                      setMaxDf(maxDf + 1);
+                    }
+                  }}
+                >
+                  +
+                </IntValueButton>
+                <IntValue>{persianDigits(maxDf)}</IntValue>
+                <IntValueButton
+                  onClick={() => {
+                    if (maxDf > 0) {
+                      setMaxDf(maxDf - 1);
+                    }
+                  }}
+                >
+                  -
+                </IntValueButton>
               </IntValueButtonContainer>
             </IntValueContainer>,
             <IntValueContainer>
               <IntValuelabel>{"تعداد رویداد های قابل استخراج"}</IntValuelabel>
               <IntValueButtonContainer>
-                <IntValueButton>+</IntValueButton>
-                <IntValue>0</IntValue>
-                <IntValueButton>-</IntValueButton>
+                <IntValueButton
+                  onClick={() => {
+                    if (eventNumber < 100) {
+                      setEventNumber(eventNumber + 1);
+                    }
+                  }}
+                >
+                  +
+                </IntValueButton>
+                <IntValue>{persianDigits(eventNumber)}</IntValue>
+                <IntValueButton
+                  onClick={() => {
+                    if (eventNumber > 0) {
+                      setEventNumber(eventNumber - 1);
+                    }
+                  }}
+                >
+                  -
+                </IntValueButton>
               </IntValueButtonContainer>
             </IntValueContainer>,
             <IntValueContainer>
               <IntValuelabel>{"حداقل پیام شامل عبارت پردازشی"}</IntValuelabel>
               <IntValueButtonContainer>
-                <IntValueButton>+</IntValueButton>
-                <IntValue>0</IntValue>
-                <IntValueButton>-</IntValueButton>
+                <IntValueButton
+                  onClick={() => {
+                    if (lowestNumberProcess < 100) {
+                      setLowestNumberProcess(lowestNumberProcess + 1);
+                    }
+                  }}
+                >
+                  +
+                </IntValueButton>
+                <IntValue>{persianDigits(lowestNumberProcess)}</IntValue>
+                <IntValueButton
+                  onClick={() => {
+                    if (lowestNumberProcess > 0) {
+                      setLowestNumberProcess(lowestNumberProcess - 1);
+                    }
+                  }}
+                >
+                  -
+                </IntValueButton>
               </IntValueButtonContainer>
             </IntValueContainer>,
             <IntValueContainer>
               <IntValuelabel>{"میزان اختلاف بین رویداد ها"}</IntValuelabel>
               <IntValueButtonContainer>
-                <IntValueButton>+</IntValueButton>
-                <IntValue>0</IntValue>
-                <IntValueButton>-</IntValueButton>
+                <IntValueButton
+                  onClick={() => {
+                    if (diffEvents < 100) {
+                      setDiffEvents(diffEvents + 1);
+                    }
+                  }}
+                >
+                  +
+                </IntValueButton>
+                <IntValue>{persianDigits(diffEvents)}</IntValue>
+                <IntValueButton
+                  onClick={() => {
+                    if (diffEvents > 0) {
+                      setDiffEvents(diffEvents - 1);
+                    }
+                  }}
+                >
+                  -
+                </IntValueButton>
               </IntValueButtonContainer>
             </IntValueContainer>,
             <IntValueContainer>
@@ -166,9 +287,25 @@ function NewEventProcessScreen() {
                 {"تعداد عبارت نمایشی برای معرفی یک رویداد"}
               </IntValuelabel>
               <IntValueButtonContainer>
-                <IntValueButton>+</IntValueButton>
-                <IntValue>0</IntValue>
-                <IntValueButton>-</IntValueButton>
+                <IntValueButton
+                  onClick={() => {
+                    if (numberWords < 100) {
+                      setNumberWords(numberWords + 1);
+                    }
+                  }}
+                >
+                  +
+                </IntValueButton>
+                <IntValue>{persianDigits(numberWords)}</IntValue>
+                <IntValueButton
+                  onClick={() => {
+                    if (numberWords > 0) {
+                      setNumberWords(numberWords - 1);
+                    }
+                  }}
+                >
+                  -
+                </IntValueButton>
               </IntValueButtonContainer>
             </IntValueContainer>,
           ]
@@ -179,7 +316,32 @@ function NewEventProcessScreen() {
       <ButtonContainer>
         <ButtonInnerContainer>
           <CustomButton
-            onClick={() => {}}
+            onClick={async () => {
+              try {
+                if (
+                  startTimes !== null &&
+                  endTimes !== null &&
+                  lang !== null &&
+                  windowsType !== null &&
+                  title.length > 0
+                ) {
+                  await postNewEventTaskService(
+                    title,
+                    startTimes.value,
+                    endTimes.value,
+                    diffEvents,
+                    lang.value,
+                    maxDf,
+                    lowestNumberProcess,
+                    numberWords,
+                    50,
+                    eventNumber,
+                    windowsType.value,
+                    numberWindowsType
+                  );
+                }
+              } catch (err) {}
+            }}
             label={"افزودن"}
             icon={<div style={{ fontSize: "20px" }}>+</div>}
           ></CustomButton>
@@ -287,6 +449,7 @@ const IntValueButton = styled.div`
   justify-content: center;
   align-items: center;
   font-size: 25px;
+  user-select: none;
 
   &:hover {
     border: 1px solid ${Theme.fontColor};

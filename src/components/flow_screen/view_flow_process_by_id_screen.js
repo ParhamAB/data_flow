@@ -652,8 +652,8 @@ const CheckBoxList = styled.div`
 `;
 
 const CheckBoxContainer = styled.div`
-  width: fit-contente;
-  height: 50px;
+  width: fit-content;
+  height: fit-content;
   display: flex;
   justify-content: flex-start;
   align-items: center;
@@ -664,6 +664,8 @@ const CheckBoxContainer = styled.div`
 
 const CheckBoxLabel = styled.div`
   margin-right: 10px;
+  max-width: calc(100% - 50px);
+  text-overflow: clip;
 `;
 
 const Row = styled.div`

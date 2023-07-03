@@ -10,6 +10,7 @@ const getFlowProcessInfoListReducer = (state = initialState, action) => {
       return {
         ...state,
         loading: true,
+        flowInfoProcessList: {},
       };
     case "FLOW_PROCESS_INFO_SERVICE_SUCCEED":
       return {

@@ -16,7 +16,8 @@ export const getEventProcessListFunction = (
   status,
   startDate,
   title,
-  offset
+  offset,
+  limit = 15
 ) => {
   return async (dispatch) => {
     dispatch(callEventServiceProcessRequest());
@@ -25,7 +26,8 @@ export const getEventProcessListFunction = (
         status,
         startDate,
         title,
-        offset
+        offset,
+        limit
       );
       dispatch(callEventServiceProcessSucceed(req.data));
     } catch (error) {

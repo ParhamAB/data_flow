@@ -8,43 +8,85 @@ import Theme from "../../theme/theme";
 import { useDispatch, useSelector } from "react-redux";
 import moment from "jalali-moment";
 import CheckBox from "../../utils/check_box/check_box";
+import { getPickDateFunction } from "../../redux/date_redux/pick_date_action";
+import { persianDigits } from "../../utils/utils";
+import { getEventProcessListFunction } from "../../redux/events_screen/get_event_process_redux/get_event_process_action";
+import postNewFlowTaskService from "../../service/flow_process_screen/create_flow_process_service/create_flow_process_service.ts";
 
 function NewFlowProcessScreen() {
   const dispatch = useDispatch();
-  //   const eventProcessList = useSelector((state) => state.eventProcessListState);
+  const DateTimesList = useSelector((state) => state.pickDateListState);
+  const eventProcessList = useSelector((state) => state.eventProcessListState);
+
   //   const eventStartTimesList = useSelector(
   //     (state) => state.eventStartTimesState
   //   );
   const [status, setStatus] = useState(null);
   const [title, setTitle] = useState("");
-  const [startTimes, setStartTimes] = useState([]);
-  const [selectedDate, setSelectedDate] = useState(null);
+  const [timesList, setTimesList] = useState([]);
+  const [eventsList, setEventsList] = useState([]);
+  const [startTimes, setStartTimes] = useState(null);
+  const [endTimes, setEndTimes] = useState(null);
+  const [selectedEvent, setSelectedEvent] = useState(null);
   const [isChecked, setIsChecked] = useState(false);
+  const [threshold, setThreshold] = useState(0.0);
 
-  //   useEffect(() => {
-  //     dispatch(getEventStartTimesListFunction());
-  //     // eslint-disable-next-line
-  //   }, []);
+  useEffect(() => {
+    dispatch(getPickDateFunction());
+    dispatch(
+      getEventProcessListFunction("", "2000-01-01T00:00:00", "0", 0, 1000)
+    );
+    // eslint-disable-next-line
+  }, []);
 
-  //   useEffect(() => {
-  //     setStartTimes([]);
-  //     if (eventStartTimesList.eventStartTimesList.length > 0) {
-  //       eventStartTimesList.eventStartTimesList.map((e) => {
-  //         setStartTimes((oldArray) => [
-  //           ...oldArray,
-  //           {
-  //             value: e.start_date_time.split("+")[0],
-  //             label: persianDigits(
-  //               moment(e.start_date_time).format("jYYYY/jMM/jDD") +
-  //                 " - " +
-  //                 moment(e.start_date_time).format("HH:mm")
-  //             ),
-  //           },
-  //         ]);
-  //       });
-  //     }
-  //     // eslint-disable-next-line
-  //   }, [eventStartTimesList.eventStartTimesList]);
+  useEffect(() => {
+    setTimesList([]);
+    if (DateTimesList.dateList.length > 0) {
+      DateTimesList.dateList.map((e) => {
+        setTimesList((oldArray) => [
+          ...oldArray,
+          {
+            value: e.created_at.split("+")[0],
+            label: persianDigits(
+              moment(e.created_at).format("jYYYY/jMM/jDD") +
+                " - " +
+                moment(e.created_at).format("HH:mm")
+            ),
+          },
+        ]);
+      });
+    }
+    // eslint-disable-next-line
+  }, [DateTimesList.dateList]);
+
+  useEffect(() => {
+    setEventsList([]);
+    if (eventProcessList.eventProcessList.length > 0) {
+      eventProcessList.eventProcessList.map((e) => {
+        setEventsList((oldArray) => [
+          ...oldArray,
+          {
+            value: e.id_event_process,
+            label:
+              e.title +
+              " از " +
+              persianDigits(
+                moment(e.start_date_time).format("jYYYY/jMM/jDD") +
+                  " - " +
+                  moment(e.start_date_time).format("HH:mm")
+              ) +
+              " تا " +
+              persianDigits(
+                moment(e.end_date_time).format("jYYYY/jMM/jDD") +
+                  " - " +
+                  moment(e.end_date_time).format("HH:mm")
+              ),
+          },
+        ]);
+      });
+    }
+    // eslint-disable-next-line
+  }, [eventProcessList.eventProcessList]);
 
   return (
     <Container>
@@ -67,31 +109,41 @@ function NewFlowProcessScreen() {
           <DropDown
             label={"ابتدای بازه"}
             isSearchable={true}
-            defaultValue={""}
-            value={[]}
-            onChange={(value) => {}}
+            defaultValue={startTimes}
+            value={timesList}
+            onChange={(value) => {
+              setStartTimes(value);
+            }}
           />
         </BoxContainer>
         <BoxContainer>
           <DropDown
             label={"انتهای بازه"}
             isSearchable={true}
-            defaultValue={""}
-            value={[]}
-            onChange={(value) => {}}
+            defaultValue={endTimes}
+            value={timesList}
+            onChange={(value) => {
+              setEndTimes(value);
+            }}
           />
         </BoxContainer>
         <BoxContainer>
           <DropDown
             label={"رویداد ها"}
             isSearchable={true}
-            defaultValue={""}
-            value={[]}
-            onChange={(value) => {}}
+            isDisabled={!isChecked}
+            defaultValue={selectedEvent}
+            value={eventsList}
+            onChange={(value) => {
+              setSelectedEvent(value);
+            }}
           />
         </BoxContainer>
         <CheckBoxContainer
           onClick={() => {
+            if (isChecked) {
+              setSelectedEvent(null);
+            }
             setIsChecked(!isChecked);
           }}
         >
@@ -106,13 +158,37 @@ function NewFlowProcessScreen() {
         </CheckBoxContainer>
         <SliderContainer>
           <SliderLabel>{"آستانه شباهت"}</SliderLabel>
-          <Slider type="range" min={0} max={10}></Slider>
+          <Slider
+            type="range"
+            min={0}
+            max={1}
+            step={0.01}
+            value={threshold}
+            onChange={(event) => {
+              setThreshold(event.target.value);
+            }}
+          ></Slider>
         </SliderContainer>
       </SearchForm>
       <ButtonContainer>
         <ButtonInnerContainer>
           <CustomButton
-            onClick={() => {}}
+            onClick={async () => {
+              await postNewFlowTaskService(
+                title,
+                threshold,
+                selectedEvent.value,
+                startTimes.value,
+                endTimes.value
+              ).then((_) => {
+                setStartTimes(null);
+                setEndTimes(null);
+                setSelectedEvent(null);
+                setIsChecked(false);
+                setThreshold(0.0);
+                setTitle("");
+              });
+            }}
             label={"افزودن"}
             icon={<div style={{ fontSize: "20px" }}>+</div>}
           ></CustomButton>
@@ -203,6 +279,7 @@ const SliderContainer = styled.div`
   margin-block: 50px;
   margin-inline: 15px;
   padding-top: 10px;
+  position: relative;
 `;
 
 const SliderLabel = styled.div`

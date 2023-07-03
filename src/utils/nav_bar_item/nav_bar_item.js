@@ -128,6 +128,7 @@ const TextNavBar = styled.p`
   font-weight: 500;
   font-family: "iranSans";
   color: ${Theme.fontColorInActive};
+  user-select: none;
 `;
 
 const Button = styled.div`
@@ -178,6 +179,7 @@ const SubContainer = styled.div`
   align-items: flex-starts;
   transition: 300ms;
   overflow: hidden;
+  user-select: none;
 `;
 
 const SubButton = styled.div`

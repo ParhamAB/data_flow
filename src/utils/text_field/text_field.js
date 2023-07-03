@@ -39,6 +39,7 @@ const Label = styled.div`
   color: ${Theme.fontColor};
   margin-bottom: 5px;
   padding-right: 5px;
+  user-select: none;
 `;
 
 const InputTextField = styled.input`

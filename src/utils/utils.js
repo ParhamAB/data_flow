@@ -6,6 +6,25 @@ export const persianDigits = (num) => {
   return num.toString().replace(/[0-9]/g, (d) => persianNumbers[d]);
 };
 
+export const englishDigits = (num) => {
+  const persianNumbers = ["۰", "۱", "۲", "۳", "۴", "۵", "۶", "۷", "۸", "۹"];
+  let englishNumber = "";
+
+  try {
+    for (let i = 0; i < num.length; i++) {
+      const index = persianNumbers.indexOf(num[i]);
+
+      if (index !== -1) {
+        englishNumber += index;
+      } else {
+        englishNumber += num[i];
+      }
+    }
+  } catch (err) {}
+
+  return englishNumber;
+};
+
 export const persianMonth = (num) => {
   switch (num) {
     case 1:
@@ -34,6 +53,37 @@ export const persianMonth = (num) => {
       return "اسفند";
     default:
       return "";
+  }
+};
+
+export const persianMonthToNumber = (month) => {
+  switch (month) {
+    case "فروردین":
+      return 1;
+    case "اردیبهشت":
+      return 2;
+    case "خرداد":
+      return 3;
+    case "تیر":
+      return 4;
+    case "مرداد":
+      return 5;
+    case "شهریور":
+      return 6;
+    case "مهر":
+      return 7;
+    case "آبان":
+      return 8;
+    case "آذر":
+      return 9;
+    case "دی":
+      return 10;
+    case "بهمن":
+      return 11;
+    case "اسفند":
+      return 12;
+    default:
+      return 0;
   }
 };
 

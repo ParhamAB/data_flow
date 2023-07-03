@@ -1,6 +1,6 @@
 import React from "react";
 
-function ShowIcon({ color }) {
+function ShowIcon({ color = "" }) {
   return (
     <svg
       width="25"

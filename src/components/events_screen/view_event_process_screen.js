@@ -21,9 +21,11 @@ import ChartIcon from "../../utils/icons/chart_icon";
 import ActivityIcon from "../../utils/icons/navbar_icons/activity_icon";
 import FilterIcon from "../../utils/icons/filter_icon";
 import Loading from "../../utils/loading/loading";
+import { useNavigate } from "react-router-dom";
 
 function ViewEventProcessScreen() {
   const dispatch = useDispatch();
+  const navigator = useNavigate();
   const eventProcessList = useSelector((state) => state.eventProcessListState);
   const eventStartTimesList = useSelector(
     (state) => state.eventStartTimesState
@@ -187,16 +189,46 @@ function ViewEventProcessScreen() {
                     )}
                   </ValueText>
                   <ValueText flex={2}>
-                    <ButtonEachTable>
-                      <ChartIcon />
+                    <ButtonEachTable
+                      active={e.status_title === "done"}
+                      onClick={
+                        e.status_title === "done"
+                          ? async () => {
+                              navigator(
+                                `/events/all-process/statistics/${e.id_event_process}`
+                              );
+                            }
+                          : null
+                      }
+                    >
+                      <ChartIcon
+                        color={
+                          e.status_title === "done"
+                            ? "white"
+                            : Theme.fontColorInActive
+                        }
+                      />
                     </ButtonEachTable>
-                    <ButtonEachTable>
-                      <ActivityIcon color={Theme.fontColor} />
+                    <ButtonEachTable active={e.status_title === "done"}>
+                      <ActivityIcon
+                        color={
+                          e.status_title === "done"
+                            ? "white"
+                            : Theme.fontColorInActive
+                        }
+                      />
                     </ButtonEachTable>
-                    <ButtonEachTable>
-                      <FilterIcon />
+                    <ButtonEachTable active={e.status_title === "done"}>
+                      <FilterIcon
+                        color={
+                          e.status_title === "done"
+                            ? "white"
+                            : Theme.fontColorInActive
+                        }
+                      />
                     </ButtonEachTable>
                     <ButtonEachTable
+                      active={true}
                       onClick={async () => {
                         await deleteProcessService(e.id_process);
                         dispatch(
@@ -507,15 +539,19 @@ const ButtonEachTable = styled.div`
   width: 40px;
   height: 40px;
   border-radius: ${Theme.textFieldBorderRadius};
-  border: 1px solid ${Theme.fontColor};
+  border: 1px solid
+    ${(props) => (props.active ? Theme.fontColor : Theme.fontColorInActive)};
   display: flex;
   justify-content: center;
   align-items: center;
   margin-inline: 5px;
-  cursor: pointer;
+  cursor: ${(props) => (props.active ? `pointer` : "default")};
   transition: 300ms;
 
-  &:hover {
+  ${(props) =>
+    props.active
+      ? `&:hover {
     background-color: #6600cc6b;
-  }
+  }`
+      : null}
 `;
