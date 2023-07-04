@@ -57,6 +57,7 @@ function ViewFlowMyProcessByIdScreen() {
   const [isCheckedList, setIsCheckedList] = useState([]);
   const [flowChartData, setFlowChartData] = useState([]);
   const [flowChartLabel, setFlowChartLabel] = useState([]);
+  const [Labels, setLabels] = useState([]);
 
   useEffect(() => {
     dispatch(getFlowProcessInfoListFunction(id));
@@ -443,44 +444,72 @@ function ViewFlowMyProcessByIdScreen() {
                     onClick={() => {
                       e.isChecked = !e.isChecked;
                       let arr = [];
-                      if (e.isChecked) {
-                        let red = Math.floor(Math.random() * 256);
-                        let green = Math.floor(Math.random() * 256);
-                        let blue = Math.floor(Math.random() * 256);
-                        let rgbColor = `rgb(${red}, ${green}, ${blue})`;
-                        let rgbColorOpacity = `rgb(${red}, ${green}, ${blue},0.5)`;
-                        e.data.event_chain.map((e) => {
-                          arr.push(e.Count);
-                          if (!flowChartLabel.includes(e.model)) {
-                            setFlowChartLabel((oldArray) => [
+                      setFlowChartLabel([]);
+                      setFlowChartData([]);
+                      isCheckedList
+                        .filter((p) => p.isChecked === true)
+                        .map((temp, index) => {
+                          let red = Math.floor(Math.random() * 256);
+                          let green = Math.floor(Math.random() * 256);
+                          let blue = Math.floor(Math.random() * 256);
+                          let rgbColor = `rgb(${red}, ${green}, ${blue})`;
+                          let rgbColorOpacity = `rgb(${red}, ${green}, ${blue},0.5)`;
+                          let arr = [];
+                          temp.data.event_chain.map((temp2) => {
+                            arr.push(temp2.Count);
+                            if (
+                              flowChartLabel.filter(
+                                (s) => s.model === temp2.model
+                              ).length === 0
+                            ) {
+                              setFlowChartLabel((oldArray) => [
+                                ...oldArray,
+                                temp2.model,
+                              ]);
+                            }
+                            // flowChartLabel.map((lbl) => {
+                            //   if (lbl === temp2.model) {
+                            //     arr.push(temp2.Count);
+                            //   } else {
+                            //     arr.push(null);
+                            //   }
+                            // });
+                            setFlowChartData((oldArray) => [
                               ...oldArray,
-                              e.model,
+                              {
+                                id: index,
+                                label: "",
+                                data: arr,
+                                borderColor: rgbColor,
+                                backgroundColor: rgbColorOpacity,
+                              },
                             ]);
-                          }
+                          });
                         });
-                        setFlowChartData((oldArray) => [
-                          ...oldArray,
-                          {
-                            id: index,
-                            label: "",
-                            data: arr,
-                            borderColor: rgbColor,
-                            backgroundColor: rgbColorOpacity,
-                          },
-                        ]);
-                      } else {
-                        // if (
-                        //   flowChartLabel.filter((item) => item === e.model)
-                        //     .length === 1
-                        // ) {
-                        //   setFlowChartLabel((oldArray) => [
-                        //     ...oldArray.filter((item) => item !== e.model),
-                        //   ]);
-                        // }
-                        setFlowChartData((oldArray) => [
-                          ...oldArray.filter((item) => item.id !== index),
-                        ]);
-                      }
+
+                      // if (e.isChecked) {
+
+                      //   e.data.event_chain.map((e) => {
+                      //     arr.push(e.Count);
+                      //     setLabels((oldArray) => [...oldArray, e.model]);
+                      //     if (!flowChartLabel.includes(e.model)) {
+                      //       setFlowChartLabel((oldArray) => [
+                      //         ...oldArray,
+                      //         e.model,
+                      //       ]);
+                      //     }
+                      //   });
+                      //   setFlowChartData((oldArray) => [
+                      //     ...oldArray,
+                      //     {
+                      //       id: index,
+                      //       label: "",
+                      //       data: arr,
+                      //       borderColor: rgbColor,
+                      //       backgroundColor: rgbColorOpacity,
+                      //     },
+                      //   ]);
+                      // }
                     }}
                   >
                     <CheckBox value={e.isChecked} onClick={() => {}}></CheckBox>

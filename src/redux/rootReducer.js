@@ -15,6 +15,9 @@ import mediaListReducer from "./main_menu_screen/media_redux/media_reducer";
 import eventsNewsListReducer from "./main_menu_screen/events_redux/events_reducer";
 import flowChartMainMenuListReducer from "./main_menu_screen/flow_redux/flow_reducer";
 import eventChartListReducer from "./events_screen/events_chart_redux/events_chart_redux_reducer";
+import eventIntervalListReducer from "./events_screen/get_interval_events_redux/get_interval_events_reducer";
+import eventIntervalsDataEachListReducer from "./events_screen/get_interval_events_each_redux/get_interval_events_each_reducer";
+import eventNodeListReducer from "./events_screen/get_node_events_redux/get_node_events_reducer";
 
 const rootReducer = combineReducers({
   processListState: processListReducer,
@@ -33,6 +36,9 @@ const rootReducer = combineReducers({
   eventsNewsListState: eventsNewsListReducer,
   flowChartMainMenuListState: flowChartMainMenuListReducer,
   eventChartListState: eventChartListReducer,
+  eventIntervalListState: eventIntervalListReducer,
+  eventIntervalsDataEachListState: eventIntervalsDataEachListReducer,
+  eventNodeListState: eventNodeListReducer,
 });
 
 export default rootReducer;

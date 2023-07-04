@@ -2,17 +2,8 @@ import React, { useEffect, useRef, useState } from "react";
 import styled from "styled-components";
 import { Text } from "../../../utils/widgets/widgets";
 import Theme from "../../../theme/theme";
-import TextField from "../../../utils/text_field/text_field";
-import CustomButton from "../../../utils/custom_button/custom_button";
-import DropDown from "../../../utils/drop_down/drop_down";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  englishDigits,
-  isStringOnlyNumbers,
-  persianDigits,
-  persianMonth,
-  persianMonthToNumber,
-} from "../../../utils/utils";
+import { getRandomColor, persianDigits } from "../../../utils/utils";
 import moment from "jalali-moment";
 import {
   Chart as ChartJS,
@@ -25,8 +16,11 @@ import { Bar, getElementsAtEvent } from "react-chartjs-2";
 import Loading from "../../../utils/loading/loading";
 import { getEventChartFunction } from "../../../redux/events_screen/events_chart_redux/events_chart_redux_action";
 import { useParams } from "react-router-dom";
+import Modal from "react-modal";
+import { TagCloud } from "react-tagcloud";
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Tooltip);
+Modal.setAppElement("#root");
 
 function ShowEventChart() {
   const { id } = useParams();
@@ -36,17 +30,48 @@ function ShowEventChart() {
   const [selectedEventsData, setSelectedEventsData] = useState([]);
   const [startEndChartLabel, setStartEndChartLabel] = useState([]);
   const [startEndChartData, setStartEndChartData] = useState([]);
-  //   const [justMonthTextField, setJustMonthTextField] = useState("");
-  //   const [daysLabel, setDaysLabel] = useState([]);
-  //   const [daysData, setDaysData] = useState([]);
-  //   const [justDaysTextField_year, setJustDaysTextField_year] = useState("");
-  //   const [justDaysTextField_month, setJustDaysTextField_month] = useState(null);
-  //   const [isFirstLoad, setIsFirstLoad] = useState(true);
+  const [wordCloud, setWordCloud] = useState([]);
+  const [noteList, setNoteList] = useState([]);
+  const [selectedIndex, setSelectedIndex] = useState(0);
 
   const yearChartRef = useRef(null);
   const monthChartRef = useRef(null);
   const daysChartRef = useRef(null);
-  //   const startTimesList = useSelector((state) => state.flowStartTimesState);
+
+  const [modalIsOpen, setIsOpen] = React.useState(false);
+
+  function openModal() {
+    setIsOpen(true);
+  }
+
+  function closeModal() {
+    setIsOpen(false);
+  }
+
+  const customStyles = {
+    overlay: {
+      position: "fixed",
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      backgroundColor: "#31313180",
+    },
+    content: {
+      top: "50%",
+      left: "50%",
+      right: "auto",
+      bottom: "auto",
+      marginRight: "-50%",
+      transform: "translate(-50%, -50%)",
+      background: Theme.backGroundColorGrey,
+      border: "0px solid #ccc",
+      WebkitOverflowScrolling: "touch",
+      borderRadius: "15px",
+      outline: "none",
+      padding: "25px",
+    },
+  };
 
   useEffect(() => {
     dispatch(getEventChartFunction(id));
@@ -55,13 +80,22 @@ function ShowEventChart() {
   useEffect(() => {
     setSelectedEventsData([]);
     setSelectedEventsLabel([]);
+    setWordCloud([]);
+    setNoteList([]);
     eventChartList.eventChartModelZeroList.map((e, index) => {
+      let temp = [];
+      e.keywords.map((e) => {
+        temp.push({ value: Object.keys(e)[0], count: Object.values(e)[0] });
+      });
+      setWordCloud((oldArray) => [...oldArray, temp]);
+      setNoteList((oldArray) => [...oldArray, e.representative_documents]);
       setSelectedEventsLabel((oldArrays) => [
         ...oldArrays,
         persianDigits(e.x_index),
       ]);
       setSelectedEventsData((oldArrays) => [...oldArrays, e.y_index]);
     });
+    console.log(noteList);
   }, [eventChartList.eventChartModelZeroList]);
 
   useEffect(() => {
@@ -80,48 +114,17 @@ function ShowEventChart() {
     });
   }, [eventChartList.eventChartModelOneList]);
 
-  //   useEffect(() => {
-  //     setDaysData([]);
-  //     setDaysLabel([]);
-  //     daysAnalysis.daysData.map((e) => {
-  //       setDaysLabel((oldArrays) => [...oldArrays, persianDigits(e._day)]);
-  //       setDaysData((oldArrays) => [...oldArrays, e.count]);
-  //     });
-  //   }, [eventChartList.eventChartModelOneList]);
-
   const handleBarYearClick = (event) => {
     let details = getElementsAtEvent(yearChartRef.current, event);
-    // if (details.length > 0) {
-    //   let temp = moment(
-    //     `${englishDigits(yearsLabel[details[0].index])}-01-01`,
-    //     "jYYYY-jMM-jDD"
-    //   );
-    //   setJustMonthTextField(yearsLabel[details[0].index]);
-    //   dispatch(
-    //     getMonthsAnalysisListFunction(parseInt(moment(temp).format("YYYY")) + 1)
-    //   );
-    // }
+    if (details.length > 0) {
+      setSelectedIndex(details[0].index);
+      openModal();
+    }
   };
 
   const handleBarMonthClick = (event) => {
     let details = getElementsAtEvent(monthChartRef.current, event);
     // if (details.length > 0) {
-    //   let temp = moment(
-    //     `${englishDigits(justMonthTextField)}-01-01`,
-    //     "jYYYY-jMM-jDD"
-    //   );
-    //   setJustDaysTextField_year(justMonthTextField);
-    //   setJustDaysTextField_month({
-    //     label: monthsLabel[details[0].index],
-    //     value: persianMonthToNumber(monthsLabel[details[0].index]),
-    //   });
-    //   setJustMonthTextField(yearsLabel[details[0].index]);
-    //   dispatch(
-    //     getDaysAnalysisListFunction(
-    //       parseInt(moment(temp).format("YYYY")) + 1,
-    //       persianMonthToNumber(monthsLabel[details[0].index])
-    //     )
-    //   );
     // }
   };
 
@@ -353,6 +356,37 @@ function ShowEventChart() {
           )}
         </ChartContainer>
       </BoxContainer>
+      <Modal
+        isOpen={modalIsOpen}
+        onRequestClose={closeModal}
+        style={customStyles}
+        contentLabel="Example Modal"
+      >
+        <InsideBox>
+          <Title>{"مشخصات پیام"}</Title>
+          <WordCloud>
+            <TagCloud
+              minSize={12}
+              maxSize={35}
+              tags={wordCloud[selectedIndex]}
+              className="wordCloud"
+            />
+          </WordCloud>
+          <Title>{"پیام های مرتبط :"}</Title>
+          <NoteContainer>
+            {noteList && noteList[selectedIndex]
+              ? noteList[selectedIndex].map((e) => {
+                  return (
+                    <PmContainerEach>
+                      <Divider color={getRandomColor()}></Divider>
+                      {e}
+                    </PmContainerEach>
+                  );
+                })
+              : null}
+          </NoteContainer>
+        </InsideBox>
+      </Modal>
     </Container>
   );
 }
@@ -432,4 +466,72 @@ const ColorSquare = styled.div`
   height: 10px;
   background-color: ${(props) => props.color};
   margin-left: 10px;
+`;
+
+const InsideBox = styled.div`
+  min-width: 300px;
+  max-width: 80vw;
+  height: fit-content;
+  max-height: 80vh;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  direction: rtl;
+`;
+
+const WordCloud = styled.div`
+  width: calc(80%);
+  max-width: 500px;
+  height: fit-content;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+`;
+
+const NoteContainer = styled.div`
+  width: calc(100%);
+  height: max-content;
+  margin-top: 25px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+`;
+
+const PmContainerEach = styled.div`
+  width: calc(100%);
+  height: max-content;
+  border-radius: ${Theme.textFieldBorderRadius};
+  background-color: ${Theme.backGroundColorGreyLight};
+  margin-block: 10px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+  padding-inline: 15px;
+  padding-block: 10px;
+  color: white;
+`;
+
+const Divider = styled.div`
+  width: 10px;
+  height: 70px;
+  border-radius: 15px;
+  background-color: ${(props) => props.color};
+  margin-left: 10px;
+`;
+
+const Title = styled.div`
+  width: calc(100%);
+  height: 80px;
+  color: ${Theme.fontColor};
+  font-size: 25px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+  margin-block: 20px;
 `;

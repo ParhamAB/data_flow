@@ -1,5 +1,5 @@
 import React from "react";
-import { Navigate, Route, Routes } from "react-router-dom";
+import { Route, Routes } from "react-router-dom";
 import ViewMyProcessScreen from "../components/my_process_screen/view_my_process_screen";
 import ViewEventProcessScreen from "../components/events_screen/view_event_process_screen";
 import NewEventProcessScreen from "../components/events_screen/new_processing_event_screen";
@@ -9,6 +9,8 @@ import StatisticalAnalysisOfDatabase from "../components/statistical_analysis_of
 import ViewFlowMyProcessByIdScreen from "../components/flow_screen/view_flow_process_by_id_screen";
 import MainMenuScreen from "../components/main_menu_screen/main_menu_screen";
 import ShowEventChart from "../components/events_screen/show_events_chart_screen/show_event_chart_screen";
+import EventIntervalEventsScreen from "../components/events_screen/interval_events_screen/interval_events_screen";
+import ViewEventNodeScreen from "../components/events_screen/event_node_screen/event_node_screen";
 
 function Router() {
   return (
@@ -33,6 +35,14 @@ function Router() {
         <Route
           path="/events/all-process/statistics/:id"
           element={<ShowEventChart></ShowEventChart>}
+        ></Route>
+        <Route
+          path="/events/all-process/interval-events/:id"
+          element={<EventIntervalEventsScreen></EventIntervalEventsScreen>}
+        ></Route>
+        <Route
+          path="/events/all-process/node-events/:id"
+          element={<ViewEventNodeScreen></ViewEventNodeScreen>}
         ></Route>
       </Route>
       <Route path="/flow">

@@ -18,6 +18,7 @@ import ShowIcon from "../../utils/icons/show_icon";
 import DeleteIcon from "../../utils/icons/delete_icon";
 import deleteProcessService from "../../service/delete_process_service/delete_process_service.ts";
 import Loading from "../../utils/loading/loading";
+import { useNavigate } from "react-router-dom";
 
 function ViewMyProcessScreen() {
   const dispatch = useDispatch();
@@ -29,6 +30,7 @@ function ViewMyProcessScreen() {
   const [selectedDate, setSelectedDate] = useState(null);
   const [offSet, setOffSet] = useState(0);
   const [pageNumber, setPageNumber] = useState(1);
+  const navigator = useNavigate();
 
   useEffect(() => {
     dispatch(getProcessListFunction("0", "2000-01-01T00:00:00", "0", offSet));
@@ -175,10 +177,34 @@ function ViewMyProcessScreen() {
                     )}
                   </ValueText>
                   <ValueText flex={2}>
-                    <ButtonEachTable>
-                      <ShowIcon />
+                    <ButtonEachTable
+                      active={e.status_title === "done"}
+                      onClick={
+                        e.status_title === "done"
+                          ? () => {
+                              if (e.process_type === "event") {
+                                navigator(
+                                  `/events/all-process/interval-events/${e.event_process_id}`
+                                );
+                              } else {
+                                navigator(
+                                  `/flow/all-process/${e.flow_process_id}`
+                                );
+                              }
+                            }
+                          : null
+                      }
+                    >
+                      <ShowIcon
+                        color={
+                          e.status_title === "done"
+                            ? Theme.fontColor
+                            : Theme.fontColorInActive
+                        }
+                      />
                     </ButtonEachTable>
                     <ButtonEachTable
+                      active={true}
                       onClick={async () => {
                         await deleteProcessService(e.id_process);
                         dispatch(
@@ -489,15 +515,19 @@ const ButtonEachTable = styled.div`
   width: 40px;
   height: 40px;
   border-radius: ${Theme.textFieldBorderRadius};
-  border: 1px solid ${Theme.fontColor};
+  border: 1px solid
+    ${(props) => (props.active ? Theme.fontColor : Theme.fontColorInActive)};
   display: flex;
   justify-content: center;
   align-items: center;
   margin-inline: 5px;
-  cursor: pointer;
+  cursor: ${(props) => (props.active ? "pointer" : "default")};
   transition: 300ms;
 
-  &:hover {
+  ${(props) =>
+    props.active
+      ? `&:hover {
     background-color: #6600cc6b;
-  }
+  }`
+      : null}
 `;

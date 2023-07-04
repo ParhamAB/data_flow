@@ -23,13 +23,19 @@ function NewEventProcessScreen() {
   const [endTimes, setEndTimes] = useState(null);
   const [maxDf, setMaxDf] = useState(0);
   const [windowsType, setWindowsType] = useState(null);
+  const [textType, setTextType] = useState(null);
+  const [processModel, setProcessModel] = useState(null);
   const [numberWindowsType, setNumberWindowsType] = useState(0);
   const [deletePercent, setDeletePercent] = useState(0);
   const [lang, setLang] = useState(null);
-  const [eventNumber, setEventNumber] = useState(0);
-  const [lowestNumberProcess, setLowestNumberProcess] = useState(0);
+  const [nr_topics, setEventNumber] = useState(0);
+  const [minDf, setMinDf] = useState(0);
   const [diffEvents, setDiffEvents] = useState(0);
-  const [numberWords, setNumberWords] = useState(0);
+  const [top_n_words, setTopNWord] = useState(0);
+  const [minNgram, setMinNgram] = useState(0);
+  const [maxNgram, setMaxNgram] = useState(1);
+  const [topic_min_keyword_count, setTopic_min_keyword_count] = useState(0);
+  const [min_doc_count, setMin_doc_count] = useState(50);
   const [isOpen, setIsOpen] = useState(false);
 
   useEffect(() => {
@@ -175,9 +181,7 @@ function NewEventProcessScreen() {
               />
             </BoxContainer>,
             <IntValueContainer>
-              <IntValuelabel>
-                {"حذف عبارت پردازشی بیش از این درصد"}
-              </IntValuelabel>
+              <IntValuelabel>{"درصد تکرار عبارت پردازشی"}</IntValuelabel>
               <IntValueButtonContainer>
                 <IntValueButton
                   onClick={() => {
@@ -205,18 +209,18 @@ function NewEventProcessScreen() {
               <IntValueButtonContainer>
                 <IntValueButton
                   onClick={() => {
-                    if (eventNumber < 100) {
-                      setEventNumber(eventNumber + 1);
+                    if (nr_topics < 100) {
+                      setEventNumber(nr_topics + 1);
                     }
                   }}
                 >
                   +
                 </IntValueButton>
-                <IntValue>{persianDigits(eventNumber)}</IntValue>
+                <IntValue>{persianDigits(nr_topics)}</IntValue>
                 <IntValueButton
                   onClick={() => {
-                    if (eventNumber > 0) {
-                      setEventNumber(eventNumber - 1);
+                    if (nr_topics > 0) {
+                      setEventNumber(nr_topics - 1);
                     }
                   }}
                 >
@@ -229,18 +233,18 @@ function NewEventProcessScreen() {
               <IntValueButtonContainer>
                 <IntValueButton
                   onClick={() => {
-                    if (lowestNumberProcess < 100) {
-                      setLowestNumberProcess(lowestNumberProcess + 1);
+                    if (minDf < 100) {
+                      setMinDf(minDf + 1);
                     }
                   }}
                 >
                   +
                 </IntValueButton>
-                <IntValue>{persianDigits(lowestNumberProcess)}</IntValue>
+                <IntValue>{persianDigits(minDf)}</IntValue>
                 <IntValueButton
                   onClick={() => {
-                    if (lowestNumberProcess > 0) {
-                      setLowestNumberProcess(lowestNumberProcess - 1);
+                    if (minDf > 0) {
+                      setMinDf(minDf - 1);
                     }
                   }}
                 >
@@ -249,7 +253,7 @@ function NewEventProcessScreen() {
               </IntValueButtonContainer>
             </IntValueContainer>,
             <IntValueContainer>
-              <IntValuelabel>{"میزان اختلاف بین رویداد ها"}</IntValuelabel>
+              <IntValuelabel>{"تنوع عبارت در رویداد"}</IntValuelabel>
               <IntValueButtonContainer>
                 <IntValueButton
                   onClick={() => {
@@ -274,33 +278,23 @@ function NewEventProcessScreen() {
             </IntValueContainer>,
             <IntValueContainer>
               <IntValuelabel>
-                {"مدل آموزش دیده مورد استفاده جهت استخراج رویداد"}
-              </IntValuelabel>
-              <IntValueButtonContainer>
-                <IntValueButton>+</IntValueButton>
-                <IntValue>0</IntValue>
-                <IntValueButton>-</IntValueButton>
-              </IntValueButtonContainer>
-            </IntValueContainer>,
-            <IntValueContainer>
-              <IntValuelabel>
-                {"تعداد عبارت نمایشی برای معرفی یک رویداد"}
+                {"حداکثر تعداد عبارت نمایشی در رویداد"}
               </IntValuelabel>
               <IntValueButtonContainer>
                 <IntValueButton
                   onClick={() => {
-                    if (numberWords < 100) {
-                      setNumberWords(numberWords + 1);
+                    if (top_n_words < 100) {
+                      setTopNWord(top_n_words + 1);
                     }
                   }}
                 >
                   +
                 </IntValueButton>
-                <IntValue>{persianDigits(numberWords)}</IntValue>
+                <IntValue>{persianDigits(top_n_words)}</IntValue>
                 <IntValueButton
                   onClick={() => {
-                    if (numberWords > 0) {
-                      setNumberWords(numberWords - 1);
+                    if (top_n_words > 0) {
+                      setTopNWord(top_n_words - 1);
                     }
                   }}
                 >
@@ -308,6 +302,129 @@ function NewEventProcessScreen() {
                 </IntValueButton>
               </IntValueButtonContainer>
             </IntValueContainer>,
+            <IntValueContainer>
+              <IntValuelabel>{"حداقل میزان ngram"}</IntValuelabel>
+              <IntValueButtonContainer>
+                <IntValueButton
+                  onClick={() => {
+                    if (minNgram + 1 < maxNgram) {
+                      setMinNgram(minNgram + 1);
+                    }
+                  }}
+                >
+                  +
+                </IntValueButton>
+                <IntValue>{persianDigits(minNgram)}</IntValue>
+                <IntValueButton
+                  onClick={() => {
+                    if (minNgram > 0) {
+                      setMinNgram(minNgram - 1);
+                    }
+                  }}
+                >
+                  -
+                </IntValueButton>
+              </IntValueButtonContainer>
+            </IntValueContainer>,
+            <IntValueContainer>
+              <IntValuelabel>{"حداکثر میزان ngram"}</IntValuelabel>
+              <IntValueButtonContainer>
+                <IntValueButton
+                  onClick={() => {
+                    if (maxNgram > minNgram) {
+                      setMaxNgram(maxNgram + 1);
+                    }
+                  }}
+                >
+                  +
+                </IntValueButton>
+                <IntValue>{persianDigits(maxNgram)}</IntValue>
+                <IntValueButton
+                  onClick={() => {
+                    if (maxNgram > 0 && maxNgram - 1 > minNgram) {
+                      setMaxNgram(maxNgram - 1);
+                    }
+                  }}
+                >
+                  -
+                </IntValueButton>
+              </IntValueButtonContainer>
+            </IntValueContainer>,
+            <IntValueContainer>
+              <IntValuelabel>{"حداقل سایز رویداد"}</IntValuelabel>
+              <IntValueButtonContainer>
+                <IntValueButton
+                  onClick={() => {
+                    setTopic_min_keyword_count(topic_min_keyword_count + 1);
+                  }}
+                >
+                  +
+                </IntValueButton>
+                <IntValue>{persianDigits(topic_min_keyword_count)}</IntValue>
+                <IntValueButton
+                  onClick={() => {
+                    if (topic_min_keyword_count > 0) {
+                      setTopic_min_keyword_count(topic_min_keyword_count - 1);
+                    }
+                  }}
+                >
+                  -
+                </IntValueButton>
+              </IntValueButtonContainer>
+            </IntValueContainer>,
+            <IntValueContainer>
+              <IntValuelabel>
+                {"حداقل مستندات شامل عبارت پردازشی"}
+              </IntValuelabel>
+              <IntValueButtonContainer>
+                <IntValueButton
+                  onClick={() => {
+                    setMin_doc_count(min_doc_count + 1);
+                  }}
+                >
+                  +
+                </IntValueButton>
+                <IntValue>{persianDigits(min_doc_count)}</IntValue>
+                <IntValueButton
+                  onClick={() => {
+                    if (min_doc_count > 0) {
+                      setMin_doc_count(min_doc_count - 1);
+                    }
+                  }}
+                >
+                  -
+                </IntValueButton>
+              </IntValueButtonContainer>
+            </IntValueContainer>,
+            <BoxContainer>
+              <DropDown
+                label={"نوع پردازش متن ها"}
+                defaultValue={textType}
+                value={[
+                  { label: "همه متن ها", value: "0" },
+                  { label: "اسم ها", value: "1" },
+                  { label: "فعل ها", value: "2" },
+                ]}
+                onChange={(value) => {
+                  setTextType(value);
+                }}
+              />
+            </BoxContainer>,
+            <BoxContainer>
+              <DropDown
+                label={"مدل پردازشی"}
+                defaultValue={processModel}
+                value={[
+                  {
+                    label: "paraphrase-multilingual-MiniLM-L12-v2",
+                    value: "paraphrase-multilingual-MiniLM-L12-v2",
+                  },
+                ]}
+                onChange={(value) => {
+                  setProcessModel(value);
+                }}
+              />
+            </BoxContainer>,
           ]
         ) : (
           <></>
@@ -329,15 +446,20 @@ function NewEventProcessScreen() {
                     title,
                     startTimes.value,
                     endTimes.value,
-                    diffEvents,
+                    diffEvents / 100,
                     lang.value,
-                    maxDf,
-                    lowestNumberProcess,
-                    numberWords,
-                    50,
-                    eventNumber,
+                    maxDf / 100,
+                    minDf,
+                    top_n_words,
+                    min_doc_count,
+                    nr_topics,
                     windowsType.value,
-                    numberWindowsType
+                    numberWindowsType,
+                    minNgram,
+                    maxNgram,
+                    topic_min_keyword_count,
+                    textType.value,
+                    processModel.value
                   );
                 }
               } catch (err) {}

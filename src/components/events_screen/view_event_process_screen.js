@@ -209,7 +209,18 @@ function ViewEventProcessScreen() {
                         }
                       />
                     </ButtonEachTable>
-                    <ButtonEachTable active={e.status_title === "done"}>
+                    <ButtonEachTable
+                      active={e.status_title === "done"}
+                      onClick={
+                        e.status_title === "done"
+                          ? async () => {
+                              navigator(
+                                `/events/all-process/interval-events/${e.id_event_process}`
+                              );
+                            }
+                          : null
+                      }
+                    >
                       <ActivityIcon
                         color={
                           e.status_title === "done"
@@ -218,7 +229,18 @@ function ViewEventProcessScreen() {
                         }
                       />
                     </ButtonEachTable>
-                    <ButtonEachTable active={e.status_title === "done"}>
+                    <ButtonEachTable
+                      active={e.status_title === "done"}
+                      onClick={
+                        e.status_title === "done"
+                          ? async () => {
+                              navigator(
+                                `/events/all-process/node-events/${e.id_event_process}`
+                              );
+                            }
+                          : null
+                      }
+                    >
                       <FilterIcon
                         color={
                           e.status_title === "done"

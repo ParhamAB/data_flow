@@ -13,7 +13,13 @@ export default async function postNewEventTaskService(
   min_doc_count: number,
   nr_topics: number,
   window_type: string,
-  window_size: number
+  window_size: number,
+  ngram_min: number,
+  ngram_max: number,
+  topic_min_keyword_count: number,
+  text_process_type: number,
+  embedding_model_name: string
+  // vectorizer_feature_count: number
 ): Promise<any> {
   let serviceCaller = new ServiceCaller();
   await serviceCaller.call(`process/task/event/`, MethodsService.POST, {
@@ -31,11 +37,15 @@ export default async function postNewEventTaskService(
       social_network: "string",
       viewer_group_id: [0],
     },
+    ngram_range: [ngram_min, ngram_max],
     stop_words_file_name: [],
     top_n_word: top_n_word,
     window_size: window_size,
     window_type: window_type,
-    topic_min_keyword_count: 5,
+    topic_min_keyword_count: topic_min_keyword_count,
+    text_process_type: text_process_type,
+    embedding_model_name: embedding_model_name,
+    // vectorizer_feature_count: vectorizer_feature_count,
   });
   return serviceCaller.response;
 }

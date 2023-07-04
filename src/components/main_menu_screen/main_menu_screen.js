@@ -17,7 +17,6 @@ import ChatIcon from "../../utils/icons/chat_icon";
 import LikeIcon from "../../utils/icons/like_icon";
 import ArrowLeftSquare from "../../utils/icons/arrow_left_square_icon";
 import { getEventsNewsListFunction } from "../../redux/main_menu_screen/events_redux/events_action";
-import ReactWordcloud from "react-wordcloud";
 import "tippy.js/dist/tippy.css";
 import "tippy.js/animations/scale.css";
 import moment from "jalali-moment";
@@ -32,6 +31,8 @@ import {
 } from "chart.js";
 import { Line } from "react-chartjs-2";
 import { getFlowChartMainMenuListFunction } from "../../redux/main_menu_screen/flow_redux/flow_action";
+import { TagCloud } from "react-tagcloud";
+import Loading from "../../utils/loading/loading";
 
 ChartJS.register(
   CategoryScale,
@@ -77,6 +78,7 @@ function MainMenuScreen() {
   };
 
   useEffect(() => {
+    setMediaList([]);
     dispatch(getMediaListFunction());
     dispatch(getEventsNewsListFunction());
     dispatch(getFlowChartMainMenuListFunction());
@@ -94,12 +96,12 @@ function MainMenuScreen() {
     setEventNewsList([]);
     getEventsList.eventsNewsList.map((e) => {
       let keys = [];
-      let value = [];
       e.keywords.map((e) => {
         let t1 = Object.keys(e);
         let t2 = Object.values(e);
-        keys.push({ text: t1[0], value: t2[0] });
-        value.push(100);
+        if (t1[0].length > 0) {
+          keys.push({ value: t1[0], count: t2[0] });
+        }
       });
       setEventNewsList((oldArray) => [
         ...oldArray,
@@ -139,214 +141,242 @@ function MainMenuScreen() {
       <Text text={"صفحه اصلی"} fontSize="20px" fontWeight={700}></Text>
       <NewsContainer>
         <HotNewsContainer>
-          <CarouselContainer>
-            <Swiper
-              style={{
-                width: "calc(100%)",
-                height: "calc(100%)",
-                boxSizing: "border-box",
-                position: "relative",
-              }}
-              navigation={{
-                prevEl: prevNewsRef.current,
-                nextEl: nextNewsRef.current,
-              }}
-              controller={swiper}
-              modules={[Navigation]}
-              onInit={() => setInit(true)}
-            >
-              {mediaList.map((e) => {
-                return (
-                  <SwiperSlide
-                    style={{
-                      width: "calc(100%)",
-                      height: "calc(100%)",
-                      display: "flex",
-                      flexDirection: "column",
-                      justifyContent: "center",
-                      alignItems: "center",
-                    }}
-                  >
-                    <TitleItem></TitleItem>
-                    <BottomItem>
-                      <Description>
-                        <TextDis>{e.tweet_text}</TextDis>
-                      </Description>
-                      <DesInfo>
-                        <EachDesInfoContainer>
-                          <Value>{persianDigits(e.retweet_count)}</Value>
-                          <SwapIcon color={"#C7C9D9"} />
-                        </EachDesInfoContainer>
-                        <EachDesInfoContainer>
-                          <Value>{persianDigits(e.retweet_count)}</Value>
-                          <ShowIcon color={"#C7C9D9"} />
-                        </EachDesInfoContainer>
-                        <EachDesInfoContainer>
-                          <Value>{persianDigits(e.reply_count)}</Value>
-                          <ChatIcon color={"#C7C9D9"} />
-                        </EachDesInfoContainer>
-                        <EachDesInfoContainer>
-                          <Value>{persianDigits(e.like_count)}</Value>
-                          <LikeIcon color={"#C7C9D9"} />
-                        </EachDesInfoContainer>
-                      </DesInfo>
-                    </BottomItem>
-                  </SwiperSlide>
-                );
-              })}
-            </Swiper>
-            <NextButton ref={nextNewsRef}>
-              <ArrowLeftIcon />
-            </NextButton>
-            <PrevButton ref={prevNewsRef}>
-              <ArrowLeftIcon />
-            </PrevButton>
-          </CarouselContainer>
-          <ButtonContainer>
-            <ButtonShowAll>
-              <ButtonText>{"همه پیام های داغ"}</ButtonText>
-              <ArrowLeftSquare />
-            </ButtonShowAll>
-          </ButtonContainer>
+          {!getMediaList.loading ? (
+            <>
+              <CarouselContainer>
+                <Swiper
+                  style={{
+                    width: "calc(100%)",
+                    height: "calc(100%)",
+                    boxSizing: "border-box",
+                    position: "relative",
+                  }}
+                  navigation={{
+                    prevEl: prevNewsRef.current,
+                    nextEl: nextNewsRef.current,
+                  }}
+                  controller={swiper}
+                  modules={[Navigation]}
+                  onInit={() => setInit(true)}
+                >
+                  {mediaList.map((e) => {
+                    return (
+                      <SwiperSlide
+                        style={{
+                          width: "calc(100%)",
+                          height: "calc(100%)",
+                          display: "flex",
+                          flexDirection: "column",
+                          justifyContent: "center",
+                          alignItems: "center",
+                        }}
+                      >
+                        <TitleItem></TitleItem>
+                        <BottomItem>
+                          <Description>
+                            <TextDis>{e.tweet_text}</TextDis>
+                          </Description>
+                          <DesInfo>
+                            <EachDesInfoContainer>
+                              <Value>{persianDigits(e.retweet_count)}</Value>
+                              <SwapIcon color={"#C7C9D9"} />
+                            </EachDesInfoContainer>
+                            <EachDesInfoContainer>
+                              <Value>{persianDigits(e.retweet_count)}</Value>
+                              <ShowIcon color={"#C7C9D9"} />
+                            </EachDesInfoContainer>
+                            <EachDesInfoContainer>
+                              <Value>{persianDigits(e.reply_count)}</Value>
+                              <ChatIcon color={"#C7C9D9"} />
+                            </EachDesInfoContainer>
+                            <EachDesInfoContainer>
+                              <Value>{persianDigits(e.like_count)}</Value>
+                              <LikeIcon color={"#C7C9D9"} />
+                            </EachDesInfoContainer>
+                          </DesInfo>
+                        </BottomItem>
+                      </SwiperSlide>
+                    );
+                  })}
+                </Swiper>
+                <NextButton ref={nextNewsRef}>
+                  <ArrowLeftIcon />
+                </NextButton>
+                <PrevButton ref={prevNewsRef}>
+                  <ArrowLeftIcon />
+                </PrevButton>
+              </CarouselContainer>
+              <ButtonContainer>
+                <ButtonShowAll>
+                  <ButtonText>{"همه پیام های داغ"}</ButtonText>
+                  <ArrowLeftSquare />
+                </ButtonShowAll>
+              </ButtonContainer>
+            </>
+          ) : (
+            <Center>
+              <Loading></Loading>
+            </Center>
+          )}
         </HotNewsContainer>
         <ImportantEventsContainer>
-          <CarouselContainer>
-            <Swiper
-              style={{
-                width: "calc(100%)",
-                height: "calc(100%)",
-                boxSizing: "border-box",
-                position: "relative",
-              }}
-              navigation={{
-                prevEl: prevEventRef.current,
-                nextEl: nextEventRef.current,
-              }}
-              controller={swiper}
-              modules={[Navigation]}
-              onInit={() => setInit(true)}
-            >
-              {eventNewsList.map((e) => {
-                return (
-                  <SwiperSlide
-                    style={{
-                      width: "calc(100%)",
-                      height: "calc(100%)",
-                      display: "flex",
-                      flexDirection: "column",
-                      justifyContent: "center",
-                      alignItems: "center",
-                    }}
-                  >
-                    <TitleItem>
-                      {/* <ReactWordcloud options={options} words={e.keywordList} /> */}
-                    </TitleItem>
-                    <BottomItem>
-                      <Description>
-                        <TextDis>
-                          {e.item.representative_documents.map((e) => {
-                            return (
-                              <>
-                                <p>{e}</p>
-                                <br></br>
-                              </>
-                            );
-                          })}
-                        </TextDis>
-                      </Description>
-                      <DesInfo>
-                        <EventBottomItem>
-                          <EventInfoTitle>{"تعداد پیام"}</EventInfoTitle>
-                          <EventValue>{persianDigits(e.item.count)}</EventValue>
-                        </EventBottomItem>
-                        <Divider />
-                        <EventBottomItem>
-                          <EventInfoTitle>{"تعداد کاربر"}</EventInfoTitle>
-                          <EventValue>
-                            {persianDigits(
-                              e.item.influential_users !== null
-                                ? e.item.influential_users
-                                : 0
-                            )}
-                          </EventValue>
-                        </EventBottomItem>
-                        <Divider />
-                        <EventBottomItem>
-                          <EventInfoTitle>{"تاریخ رویداد"}</EventInfoTitle>
-                          <EventValue>
-                            {persianDigits(
-                              e.item.start_date_time !== null
-                                ? moment(e.item.start_date_time).format(
-                                    "jYYYY/jMM/jDD"
-                                  )
-                                : 0
-                            )}
-                          </EventValue>
-                        </EventBottomItem>
-                      </DesInfo>
-                    </BottomItem>
-                  </SwiperSlide>
-                );
-              })}
-            </Swiper>
-            <NextButton ref={nextEventRef}>
-              <ArrowLeftIcon />
-            </NextButton>
-            <PrevButton ref={prevEventRef}>
-              <ArrowLeftIcon />
-            </PrevButton>
-          </CarouselContainer>
-          <ButtonContainer>
-            <ButtonShowAll>
-              <ButtonText>{"همه رویداد های مهم"}</ButtonText>
-              <ArrowLeftSquare />
-            </ButtonShowAll>
-          </ButtonContainer>
+          {!getEventsList.loading ? (
+            <>
+              <CarouselContainer>
+                <Swiper
+                  style={{
+                    width: "calc(100%)",
+                    height: "calc(100%)",
+                    boxSizing: "border-box",
+                    position: "relative",
+                  }}
+                  navigation={{
+                    prevEl: prevEventRef.current,
+                    nextEl: nextEventRef.current,
+                  }}
+                  controller={swiper}
+                  modules={[Navigation]}
+                  onInit={() => setInit(true)}
+                >
+                  {eventNewsList.map((e) => {
+                    return (
+                      <SwiperSlide
+                        style={{
+                          width: "calc(100%)",
+                          height: "calc(100%)",
+                          display: "flex",
+                          flexDirection: "column",
+                          justifyContent: "center",
+                          alignItems: "center",
+                        }}
+                      >
+                        <TitleItem>
+                          <Tag>
+                            <TagCloud tags={e.keywordList} />
+                          </Tag>
+                        </TitleItem>
+                        <BottomItem>
+                          <Description>
+                            <TextDis>
+                              {e.item.representative_documents.map((e) => {
+                                return (
+                                  <>
+                                    <p>{e}</p>
+                                    <br></br>
+                                  </>
+                                );
+                              })}
+                            </TextDis>
+                          </Description>
+                          <DesInfo>
+                            <EventBottomItem>
+                              <EventInfoTitle>{"تعداد پیام"}</EventInfoTitle>
+                              <EventValue>
+                                {persianDigits(e.item.count)}
+                              </EventValue>
+                            </EventBottomItem>
+                            <Divider />
+                            <EventBottomItem>
+                              <EventInfoTitle>{"تعداد کاربر"}</EventInfoTitle>
+                              <EventValue>
+                                {persianDigits(
+                                  e.item.influential_users !== null
+                                    ? e.item.influential_users
+                                    : 0
+                                )}
+                              </EventValue>
+                            </EventBottomItem>
+                            <Divider />
+                            <EventBottomItem>
+                              <EventInfoTitle>{"تاریخ رویداد"}</EventInfoTitle>
+                              <EventValue>
+                                {persianDigits(
+                                  e.item.start_date_time !== null
+                                    ? moment(e.item.start_date_time).format(
+                                        "jYYYY/jMM/jDD"
+                                      )
+                                    : 0
+                                )}
+                              </EventValue>
+                            </EventBottomItem>
+                          </DesInfo>
+                        </BottomItem>
+                      </SwiperSlide>
+                    );
+                  })}
+                </Swiper>
+                <NextButton ref={nextEventRef}>
+                  <ArrowLeftIcon />
+                </NextButton>
+                <PrevButton ref={prevEventRef}>
+                  <ArrowLeftIcon />
+                </PrevButton>
+              </CarouselContainer>
+              <ButtonContainer>
+                <ButtonShowAll>
+                  <ButtonText>{"همه رویداد های مهم"}</ButtonText>
+                  <ArrowLeftSquare />
+                </ButtonShowAll>
+              </ButtonContainer>
+            </>
+          ) : (
+            <Center>
+              <Loading></Loading>
+            </Center>
+          )}
         </ImportantEventsContainer>
         <ImportantFlowsContainer>
-          <ChartContainer>
-            <Line
-              data={{
-                labels: [0, 1],
-                datasets: chartData,
-              }}
-              options={{
-                locale: "fa",
-                maintainAspectRatio: false,
-                scales: {
-                  x: {
-                    ticks: {
-                      color: "white",
-                      showLabelBackdrop: false,
-                      font: {
-                        size: 13,
-                        family: "iranSans",
-                        weight: 300,
+          {!getFlowChartList.loading ? (
+            <>
+              <ChartContainer>
+                <Line
+                  data={{
+                    labels: [0, 1],
+                    datasets: chartData,
+                  }}
+                  options={{
+                    locale: "fa",
+                    maintainAspectRatio: false,
+                    scales: {
+                      x: {
+                        ticks: {
+                          color: "white",
+                          showLabelBackdrop: false,
+                          font: {
+                            size: 13,
+                            family: "iranSans",
+                            weight: 300,
+                          },
+                        },
+                      },
+                      y: {
+                        ticks: {
+                          color: "white",
+                          showLabelBackdrop: false,
+                          font: {
+                            size: 13,
+                            family: "iranSans",
+                            weight: 300,
+                          },
+                        },
+                        beginAtZero: true,
                       },
                     },
-                  },
-                  y: {
-                    ticks: {
-                      color: "white",
-                      showLabelBackdrop: false,
-                      font: {
-                        size: 13,
-                        family: "iranSans",
-                        weight: 300,
-                      },
-                    },
-                    beginAtZero: true,
-                  },
-                },
-              }}
-            />
-          </ChartContainer>
-          <ButtonContainer>
-            <ButtonShowAll>
-              <ButtonText>{"همه جریان های مهم"}</ButtonText>
-              <ArrowLeftSquare />
-            </ButtonShowAll>
-          </ButtonContainer>
+                  }}
+                />
+              </ChartContainer>
+              <ButtonContainer>
+                <ButtonShowAll>
+                  <ButtonText>{"همه جریان های مهم"}</ButtonText>
+                  <ArrowLeftSquare />
+                </ButtonShowAll>
+              </ButtonContainer>
+            </>
+          ) : (
+            <Center>
+              <Loading></Loading>
+            </Center>
+          )}
         </ImportantFlowsContainer>
       </NewsContainer>
     </Container>
@@ -557,6 +587,7 @@ const TitleItem = styled.div`
   flex-direction: column;
   align-items: flex-start;
   justify-content: flex-start;
+  overflow: hidden;
 `;
 
 const BottomItem = styled.div`
@@ -692,6 +723,22 @@ const EventValue = styled.div`
 const ChartContainer = styled.div`
   width: calc(100%);
   height: calc(100% - 80px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+`;
+
+const Tag = styled.div`
+  width: calc(100%);
+  height: calc(100%);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+`;
+
+const Center = styled.div`
+  width: calc(100%);
+  height: calc(100%);
   display: flex;
   justify-content: center;
   align-items: center;
