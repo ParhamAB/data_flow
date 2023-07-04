@@ -1,5 +1,5 @@
 import React from "react";
-import { Route, Routes } from "react-router-dom";
+import { Route, Routes, Navigate } from "react-router-dom";
 import ViewMyProcessScreen from "../components/my_process_screen/view_my_process_screen";
 import ViewEventProcessScreen from "../components/events_screen/view_event_process_screen";
 import NewEventProcessScreen from "../components/events_screen/new_processing_event_screen";
@@ -65,7 +65,7 @@ function Router() {
           <StatisticalAnalysisOfDatabase></StatisticalAnalysisOfDatabase>
         }
       ></Route>
-      {/* <Route path="/*" element={<Navigate to={"/main-menu"} />}></Route> */}
+      <Route path="/*" element={<Navigate to={"/main-menu"} />}></Route>
     </Routes>
   );
 }

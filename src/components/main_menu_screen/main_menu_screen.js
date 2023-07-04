@@ -78,7 +78,6 @@ function MainMenuScreen() {
   };
 
   useEffect(() => {
-    setMediaList([]);
     dispatch(getMediaListFunction());
     dispatch(getEventsNewsListFunction());
     dispatch(getFlowChartMainMenuListFunction());
@@ -132,7 +131,6 @@ function MainMenuScreen() {
           backgroundColor: rgbColorOpacity,
         },
       ]);
-      setMediaList((oldArray) => [...oldArray, e]);
     });
   }, [getFlowChartList.flowChartList]);
 
